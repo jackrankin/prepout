@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link
+      rel="stylesheet"
+      href="./node_modules/chessground/assets/chessground.base.css"
+    />
+    <link
+      rel="stylesheet"
+      href="./node_modules/chessground/assets/chessground.brown.css"
+    />
+    <link
+      rel="stylesheet"
+      href="./node_modules/chessground/assets/chessground.cburnett.css"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite App</title>
+  </head>
+
+  <body>
+    <div id="app">
+      <div style="display: flex; padding-top: 4rem; gap: 4rem; justify-content: center;">
+
+        <!-- BOARD -->
+        <div style="display: flex; justify-content: center; align-items: center">
+          <div id="board" style="height: 75vh; width: 100%"></div>
+        </div>
+
+        <!-- PLAYER SEARCH CONFIGURATION -->
+        <div>
+          <input type="text" id="username" placeholder="chesscom username"/>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+
+</html>
