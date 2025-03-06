@@ -22,63 +22,71 @@
     <div style="display: flex; gap: 4rem; justify-content: center;">
       <!-- BOARD -->
       <div id="container" style="display: flex; justify-content: center; display: flex; flex-direction: column;">
+        <div style="text-align: center; padding: 10px;">
+          OPPONENT
+        </div>
         <div id="board" style="height: 75vh; width: 100%"></div>
         <div style="text-align: center; padding: 10px;">
-          set up position!
+          YOU
         </div>
       </div>
 
-      <!-- PLAYER SEARCH CONFIGURATION -->
-      <div style="
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-        background-color: #1e1e1e;
-        padding: 2rem;
-        border-radius: 1rem;
-        ">
-        <div style="
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-          ">
+      <!-- RIGHT SECTION -->
+      <div class="right-section">
+
+        <!-- SEARCH PARAMETERS -->
+        <div class="search-parameters">
+
+          <!-- OPP USERNAME -->
           <div>
-            <select id="website_origin" style="padding: 5px; font-size: 12px; border-radius: 5px">
+            <input style="padding: 5px; font-size: 12px" type="text" id="username" placeholder="Opponent's username" />
+          </div>
+
+          <!-- OPP COLOR -->
+          <div>
+            as :
+            <button id="colorToggle" style="cursor: pointer">
+              <svg width="17" height="17" viewBox="0 0 24 24" id="queenIcon">
+                <path fill="black" stroke="black" stroke-width="2"
+                  d="M12 2L15 8H9L12 2ZM6 8L9 22H15L18 8H6ZM3 22H21V24H3V22Z" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- WEBSITE ORIGIN -->
+          <div>
+            on :
+            <select id="websiteOrigin" style="padding: 5px; font-size: 12px; border-radius: 5px">
               <option value="chesscom">Chess.com</option>
               <option value="lichess">Lichess</option>
             </select>
           </div>
+
+
+          <!-- ENTER BUTTON -->
           <div>
-            <input style="padding: 5px; font-size: 12px" type="text" id="username" placeholder="Enter username" />
+            <button id="startSearch" style="padding: 4px; background-color: green; border-radius: 5px;">
+              GO
+            </button>
           </div>
-        </div>
-        <div>
-          finding weaknesses against :
-          <button id="colorToggle" style="cursor: pointer">
-            <svg width="17" height="17" viewBox="0 0 24 24" id="queenIcon">
-              <path fill="black" stroke="black" stroke-width="2"
-                d="M12 2L15 8H9L12 2ZM6 8L9 22H15L18 8H6ZM3 22H21V24H3V22Z" />
-            </svg>
-          </button>
-        </div>
-        <div>
-          <button id="startSearch" style="padding: 4px; width: 100%;">START PREP</button>
+
         </div>
       </div>
     </div>
   </div>
   <footer>
-    <div>
-      <a>about</a>
-      <a>instructions</a>
-      <a>github</a>
-      <a>settings</a>
+    <div style="display: flex; align-items: center; justify-content: center; gap: 2rem">
+      <a style="font-size: 12px">about</a>
+      <a style="font-size: 12px">instructions</a>
+      <div>
+        <a>github</a>
+      </div>
+      <a style="font-size: 12px">settings</a>
     </div>
   </footer>
 
   <script type="module" src="/src/board.js"></script>
-  <script type="module" src="/src/setup.js"></script>
+  <script type="module" src="/src/main.js"></script>
 </body>
 
 </html>
