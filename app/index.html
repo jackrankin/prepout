@@ -1,40 +1,84 @@
 <!DOCTYPE html>
-
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link
-      rel="stylesheet"
-      href="./node_modules/chessground/assets/chessground.base.css"
-    />
-    <link
-      rel="stylesheet"
-      href="./node_modules/chessground/assets/chessground.brown.css"
-    />
-    <link
-      rel="stylesheet"
-      href="./node_modules/chessground/assets/chessground.cburnett.css"
-    />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
-  </head>
 
-  <body>
-    <div id="app">
-      <div style="display: flex; padding-top: 4rem; gap: 4rem; justify-content: center;">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="./node_modules/chessground/assets/chessground.base.css" />
+  <link rel="stylesheet" href="./node_modules/chessground/assets/chessground.brown.css" />
+  <link rel="stylesheet" href="./node_modules/chessground/assets/chessground.cburnett.css" />
+  <link rel="stylesheet" href="src/styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vite App</title>
+  <style>
+  </style>
+</head>
 
-        <!-- BOARD -->
-        <div style="display: flex; justify-content: center; align-items: center">
-          <div id="board" style="height: 75vh; width: 100%"></div>
+<body>
+  <!-- HEADER -->
+  <div class="navbar">
+    prepout 🎠
+  </div>
+  <div class="content">
+    <div style="display: flex; gap: 4rem; justify-content: center;">
+      <!-- BOARD -->
+      <div id="container" style="display: flex; justify-content: center; display: flex; flex-direction: column;">
+        <div id="board" style="height: 75vh; width: 100%"></div>
+        <div style="text-align: center; padding: 10px;">
+          set up position!
         </div>
+      </div>
 
-        <!-- PLAYER SEARCH CONFIGURATION -->
+      <!-- PLAYER SEARCH CONFIGURATION -->
+      <div style="
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        background-color: #1e1e1e;
+        padding: 2rem;
+        border-radius: 1rem;
+        ">
+        <div style="
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+          ">
+          <div>
+            <select id="website_origin" style="padding: 5px; font-size: 12px; border-radius: 5px">
+              <option value="chesscom">Chess.com</option>
+              <option value="lichess">Lichess</option>
+            </select>
+          </div>
+          <div>
+            <input style="padding: 5px; font-size: 12px" type="text" id="username" placeholder="Enter username" />
+          </div>
+        </div>
         <div>
-          <input type="text" id="username" placeholder="chesscom username"/>
+          finding weaknesses against :
+          <button id="colorToggle" style="cursor: pointer">
+            <svg width="17" height="17" viewBox="0 0 24 24" id="queenIcon">
+              <path fill="black" stroke="black" stroke-width="2"
+                d="M12 2L15 8H9L12 2ZM6 8L9 22H15L18 8H6ZM3 22H21V24H3V22Z" />
+            </svg>
+          </button>
+        </div>
+        <div>
+          <button id="startSearch" style="padding: 4px; width: 100%;">START PREP</button>
         </div>
       </div>
     </div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+  </div>
+  <footer>
+    <div>
+      <a>about</a>
+      <a>instructions</a>
+      <a>github</a>
+      <a>settings</a>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/board.js"></script>
+  <script type="module" src="/src/setup.js"></script>
+</body>
 
 </html>
