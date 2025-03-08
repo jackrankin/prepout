@@ -21,17 +21,17 @@ colorToggle.addEventListener("click", () => {
 searching.addEventListener("click", async () => {
   console.log("FINDING", username.value, "ON", websiteOrigin.value);
   try {
-    const games = await getUserGames(
-      websiteOrigin.value,
-      username.value,
-      userIsWhite ? "black" : "white",
-      100
-    );
+    // const games = await getUserGames(
+    //   websiteOrigin.value,
+    //   username.value,
+    //   userIsWhite ? "black" : "white",
+    //   100
+    // );
 
-    const tree = new Tree(games.pgns);
-    tree.parsePGNs();
+    // const tree = new Tree(games.pgns);
+    // tree.parsePGNs();
 
-    console.log("Tree after parsing:", tree.root);
+    const tree = new Tree([]);
   } catch (error) {
     console.error("Error fetching games:", error);
   }

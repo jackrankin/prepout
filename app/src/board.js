@@ -4,6 +4,9 @@ import { Chess } from "chess.js";
 
 const boardElement = document.getElementById("board");
 
+boardElement.style.borderRadius = "12px";
+boardElement.style.overflow = "hidden";
+
 function resizeBoard() {
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;

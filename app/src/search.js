@@ -13,11 +13,18 @@ export class Tree {
   constructor(pgns) {
     this.pgns = pgns;
     this.fenNode = new Map();
+
     this.chess = new Chess();
     this.root = new Node(
       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
       0
     );
+  }
+
+  evalPosition(fen) {
+    this.engine.postMessage("ucinewgame");
+    this.engine.postMessage("position fen " + fen);
+    return this.engine.postMessage("go depth 15");
   }
 
   putPGN(pgn) {
