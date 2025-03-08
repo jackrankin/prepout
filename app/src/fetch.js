@@ -1,5 +1,5 @@
 const getChesscomGames = async (username, color, lastXdays) => {
-  const url = `https://api.chess.com/pub/player/${username}/games/2025/01`;
+  const url = `https://api.chess.com/pub/player/${username}/games/2025/02`;
 
   try {
     const response = await fetch(url);
@@ -9,13 +9,18 @@ const getChesscomGames = async (username, color, lastXdays) => {
     }
 
     const data = await response.json();
+    console.log(data, username, color);
+
     const games = data.games.filter(
       (game) =>
-        (game.white.username === username && color === "white") ||
-        (game.black.username === username && color === "black")
+        (game.white.username.toLowerCase() === username.toLowerCase() &&
+          color === "white") ||
+        (game.black.username.toLowerCase() === username.toLowerCase() &&
+          color === "black")
     );
 
     const pgns = games.map((game) => game.pgn);
+    console.log(pgns);
 
     return { pgns };
   } catch (error) {
