@@ -1,11 +1,13 @@
 // THIS FILE IS GOING TO PARSE THE PGN' AND MAKE TREES OUT OF THEM
 import { Chess } from "chess.js";
+import { getEval } from "./fetch";
 
 export class Node {
   constructor(fen, count) {
     this.fen = fen;
     this.count = count;
     this.children = [];
+    this.eval = 0;
   }
 }
 
@@ -19,12 +21,6 @@ export class Tree {
       "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
       0
     );
-  }
-
-  evalPosition(fen) {
-    this.engine.postMessage("ucinewgame");
-    this.engine.postMessage("position fen " + fen);
-    return this.engine.postMessage("go depth 15");
   }
 
   putPGN(pgn) {
@@ -68,5 +64,37 @@ export class Tree {
     for (let pgn of this.pgns) {
       this.putPGN(pgn);
     }
+  }
+
+  async evalTree(startingPosition) {
+    if (startingPosition === "") {
+      startingPosition =
+        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    }
+    if (!this.fenNode.has(startingPosition)) {
+      return null;
+    }
+    const root = this.fenNode.get(startingPosition);
+
+    const dfs = async (node) => {
+      node.eval = await getEval(node.fen);
+
+      for (let child of node) {
+        await dfs(child);
+      }
+    };
+
+    return dfs(root);
+  }
+
+  // MUAHAHAHA
+  async findWeaknesses(startingPosition, color) {
+    await this.evalTree(startingPosition);
+    this.chess = new chess();
+
+    // we will have it be something like (beginning move, )
+    const weaknesses = [];
+
+    const dfs = async (node, parent) => {};
   }
 }
