@@ -24,7 +24,7 @@ const config = {
 };
 
 export const ground = Chessground(boardElement, config);
-const chess = new Chess();
+export const chess = new Chess();
 
 const moveHistory = [{ fen: chess.fen(), move: null }];
 let currentMoveIndex = 0;

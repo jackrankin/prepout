@@ -1,13 +1,62 @@
 // THIS FILE IS GOING TO PARSE THE PGN' AND MAKE TREES OUT OF THEM
 import { Chess } from "chess.js";
 import { getEval } from "./fetch";
+import { start } from "chessground/drag";
+
+function getMoveFromFens(fenA, fenB) {
+  if (!fenA || !fenB || typeof fenA !== "string" || typeof fenB !== "string") {
+    console.error("Invalid FEN strings provided");
+    return null;
+  }
+
+  try {
+    const chess = new Chess(fenA);
+
+    const legalMoves = chess.moves({ verbose: true });
+
+    for (const move of legalMoves) {
+      const testChess = new Chess(fenA);
+
+      testChess.move(move);
+
+      const resultFen = testChess.fen();
+
+      const fenBParts = fenB.split(" ");
+      const resultFenParts = resultFen.split(" ");
+
+      const fenBCore = fenBParts.slice(0, 4).join(" ");
+      const resultFenCore = resultFenParts.slice(0, 4).join(" ");
+
+      if (fenBCore === resultFenCore) {
+        return move.san;
+      }
+    }
+
+    console.error("No legal move found between the provided positions");
+    return null;
+  } catch (error) {
+    console.error("Error analyzing chess positions:", error);
+    return null;
+  }
+}
 
 export class Node {
-  constructor(fen, count) {
+  constructor(fen, count, parent) {
     this.fen = fen;
     this.count = count;
+    this.parent = parent;
     this.children = [];
     this.eval = 0;
+  }
+}
+
+export class Weakness {
+  constructor(positionNode, resultingNode, move, occurences, evalChange) {
+    this.positionNode = positionNode;
+    this.resultingNode = resultingNode;
+    this.move = move;
+    this.occurences = occurences;
+    this.evalChange = evalChange;
   }
 }
 
@@ -49,6 +98,7 @@ export class Tree {
         nextNode = new Node(currentFen, 1);
         this.fenNode.set(currentFen, nextNode);
       }
+      nextNode.parent = currentNode;
 
       if (!currentNode.children.some((child) => child.fen === currentFen)) {
         currentNode.children.push(nextNode);
@@ -76,10 +126,13 @@ export class Tree {
     }
     const root = this.fenNode.get(startingPosition);
 
+    console.log("POSITION APPEARED", root.fen, root.count);
+    return;
+
     const dfs = async (node) => {
       node.eval = await getEval(node.fen);
 
-      for (let child of node) {
+      for (let child of node.children) {
         await dfs(child);
       }
     };
@@ -90,11 +143,58 @@ export class Tree {
   // MUAHAHAHA
   async findWeaknesses(startingPosition, color) {
     await this.evalTree(startingPosition);
-    this.chess = new chess();
+    this.chess = new Chess(startingPosition);
 
-    // we will have it be something like (beginning move, )
     const weaknesses = [];
 
-    const dfs = async (node, parent) => {};
+    const dfs = async (node, parent, turn) => {
+      // check for jumps of 1.1
+      // check if the previous position was the bad guy's position
+      if (!parent) {
+        for (let child of node.children) {
+          dfs(child, node, turn === "white" ? "black" : "white");
+        }
+
+        return;
+      }
+
+      if (
+        node.eval - parent.eval >= 1.1 &&
+        turn === "white" &&
+        color === "black" &&
+        node.eval > 1
+      ) {
+        const w = new Weakness(
+          parent,
+          node,
+          getMoveFromFens(parent.fen, node.fen),
+          node.count,
+          node.eval - parent.eval
+        );
+        weaknesses.push();
+      } else if (
+        node.eval - parent.eval <= -1.1 &&
+        turn === "black" &&
+        color === "white" &&
+        node.eval <= -1.1
+      ) {
+        const w = new Weakness(
+          parent,
+          node,
+          getMoveFromFens(parent.fen, node.fen),
+          node.count,
+          node.eval - parent.eval
+        );
+        weaknesses.push();
+      }
+
+      for (let child of node.children) {
+        dfs(child, node, turn === "white" ? "black" : "white");
+      }
+    };
+
+    dfs(startingPosition, null, this.chess.turn() === "w" ? "white" : "black");
+
+    return weaknesses;
   }
 }

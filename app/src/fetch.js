@@ -20,7 +20,6 @@ const getChesscomGames = async (username, color, lastXdays) => {
     );
 
     const pgns = games.map((game) => game.pgn);
-    console.log(pgns);
 
     return { pgns };
   } catch (error) {
@@ -79,6 +78,7 @@ const getLichessGames = async (username, color, lastXdays) => {
 
 export const getEval = async (fen) => {
   const url = `https://lichess.org/api/cloud-eval?fen=${fen}`;
+  console.log(url);
 
   try {
     const response = await fetch(url, {
@@ -88,11 +88,12 @@ export const getEval = async (fen) => {
     if (!response.ok) {
       throw new Error("Failed to fetch data");
     }
+    const result = await response.json();
 
-    return await response.json();
+    return result.pvs[0].cp / 100;
   } catch (error) {
     console.error("error evaluating position", error);
-    throw error;
+    return 0;
   }
 };
 

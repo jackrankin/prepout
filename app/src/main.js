@@ -1,5 +1,6 @@
 import "./style.css";
 import { ground } from "./board";
+import { chess } from "./board";
 import { getUserGames } from "./fetch";
 import { Tree } from "./search";
 
@@ -28,12 +29,17 @@ searching.addEventListener("click", async () => {
       100
     );
 
-    console.log(games);
-
     const tree = new Tree(games.pgns);
     tree.parsePGNs();
 
-    console.log(tree);
+    console.log(chess.fen());
+
+    const weaknesses = await tree.findWeaknesses(
+      chess.fen(),
+      "userIsWhite" ? "black" : "white"
+    );
+
+    console.log(weaknesses.length, weaknesses);
   } catch (error) {
     console.error("Error fetching games:", error);
   }
