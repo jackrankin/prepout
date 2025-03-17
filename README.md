@@ -1,2 +1,2 @@
 # prepout
-find weaknesses in your opponents Chess openings
+find weaknesses in your opponents chess openings
