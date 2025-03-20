@@ -54,7 +54,6 @@ button, input, select, option {
 .right-section {
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: space-between;
   background-color: #1e1e1e;
   padding: 2rem;
@@ -93,3 +92,110 @@ button, input, select, option {
     width: 90%;
   }
 }
+
+.evaluation-lines {
+  width: 100%;
+  margin-bottom: 2rem;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.eval-line {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #e0e0e0;
+  background-color: #f9f9f9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.eval-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  padding: 0.75rem;
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.white-advantage {
+  background-color: #ffffff;
+  color: #000000;
+  border-right: 1px solid #e0e0e0;
+}
+
+.black-advantage {
+  background-color: #000000;
+  color: #ffffff;
+  border-right: 1px solid #e0e0e0;
+}
+
+.equal-score {
+  background: linear-gradient(135deg, #ffffff 50%, #000000 50%);
+  color: transparent;
+  position: relative;
+}
+
+.equal-score::after {
+  content: attr(data-score);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #666;
+  text-shadow: 0 0 2px #fff;
+  font-weight: bold;
+}
+
+.eval-moves {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-family: "Courier New", monospace;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.9rem;
+}
+
+.line-number {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  text-align: center;
+  line-height: 20px;
+  background-color: #f0f0f0;
+  border-radius: 50%;
+  margin-right: 8px;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+@media (max-width: 768px) {
+  .eval-line {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .eval-score {
+    width: 100%;
+    padding: 0.5rem;
+  }
+  
+  .eval-moves {
+    padding: 0.5rem;
+  }
+}
+
+#board {
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+

@@ -1,11 +1,11 @@
 import "./style.css";
 import { Chessground } from "chessground";
 import { Chess } from "chess.js";
+import Engine from "./engine";
 
 const boardElement = document.getElementById("board");
-boardElement.style.borderRadius = "12px";
-boardElement.style.padding = "1px";
-boardElement.style.overflow = "hidden";
+const boardEvaluation = document.getElementById("evaluation");
+const engine = new Engine();
 
 function resizeBoard() {
   const viewportWidth = window.innerWidth;
@@ -22,6 +22,15 @@ const config = {
   coordinates: true,
   viewOnly: false,
 };
+
+const board = Chessground(boardElement, config);
+
+setTimeout(() => {
+  const cgBoard = boardElement.querySelector(".cg-board");
+  if (cgBoard) {
+    cgBoard.style.borderRadius = "inherit";
+  }
+}, 100);
 
 export const ground = Chessground(boardElement, config);
 export const chess = new Chess();

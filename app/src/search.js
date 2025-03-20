@@ -1,7 +1,6 @@
 // THIS FILE IS GOING TO PARSE THE PGN' AND MAKE TREES OUT OF THEM
 import { Chess } from "chess.js";
 import { getEval } from "./fetch";
-import { start } from "chessground/drag";
 
 function getMoveFromFens(fenA, fenB) {
   if (!fenA || !fenB || typeof fenA !== "string" || typeof fenB !== "string") {
@@ -127,7 +126,6 @@ export class Tree {
     const root = this.fenNode.get(startingPosition);
 
     console.log("POSITION APPEARED", root.fen, root.count);
-    return;
 
     const dfs = async (node) => {
       node.eval = await getEval(node.fen);
@@ -171,7 +169,7 @@ export class Tree {
           node.count,
           node.eval - parent.eval
         );
-        weaknesses.push();
+        weaknesses.push(w);
       } else if (
         node.eval - parent.eval <= -1.1 &&
         turn === "black" &&
@@ -185,7 +183,7 @@ export class Tree {
           node.count,
           node.eval - parent.eval
         );
-        weaknesses.push();
+        weaknesses.push(w);
       }
 
       for (let child of node.children) {
