@@ -1,11 +1,20 @@
 import "./style.css";
 import { Chessground } from "chessground";
 import { Chess } from "chess.js";
-import Engine from "./engine";
+import { analyzePosition } from "./engine";
 
 const boardElement = document.getElementById("board");
-const boardEvaluation = document.getElementById("evaluation");
-const engine = new Engine();
+const evalScores = [
+  document.getElementById("score1"),
+  document.getElementById("score2"),
+  document.getElementById("score3"),
+];
+
+const evalLines = [
+  document.getElementById("moves1"),
+  document.getElementById("moves2"),
+  document.getElementById("moves3"),
+];
 
 function resizeBoard() {
   const viewportWidth = window.innerWidth;
@@ -58,6 +67,30 @@ function updateBoard() {
     }
   }
 
+  console.log(chess.fen());
+
+  analyzePosition(chess.fen(), 17)
+    .then((lines) => {
+      for (let i in lines) {
+        let line = lines[i];
+        evalScores[i].innerText = `${line.score >= 0 ? "+" : ""}${
+          line.score / 100
+        }`;
+
+        if (line.score >= 0) {
+          evalScores[i].className = "white-advantage";
+        } else {
+          evalScores[i].className = "black-advantage";
+        }
+
+        let moveStr = line.moves.slice(0, 10).join(" ");
+        evalLines[i].innerText = moveStr;
+      }
+    })
+    .catch((e) => {
+      console.log("engine loading failure", e);
+    });
+
   ground.set({
     fen: chess.fen(),
     turnColor: chess.turn() === "w" ? "white" : "black",
@@ -100,6 +133,28 @@ function navigateMove(direction) {
   }
 
   chess.load(moveHistory[currentMoveIndex].fen);
+
+  analyzePosition(chess.fen(), 15)
+    .then((lines) => {
+      for (let i in lines) {
+        let line = lines[i];
+
+        evalScores[i].innerText =
+          `${line.score >= 0 ? "+" : ""}` + `${(line.score / 100).toFixed(2)}`;
+
+        if (line.score >= 0) {
+          evalScores[i].className = "white-advantage";
+        } else {
+          evalScores[i].className = "black-advantage";
+        }
+
+        let moveStr = line.moves.slice(0, 10).join(" ");
+        evalLines[i].innerText = moveStr;
+      }
+    })
+    .catch((e) => {
+      console.log("engine loading failure", e);
+    });
 
   const lastMove = moveHistory[currentMoveIndex].move;
   const lastMoveHighlight = lastMove ? [lastMove.from, lastMove.to] : undefined;

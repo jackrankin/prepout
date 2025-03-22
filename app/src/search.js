@@ -138,7 +138,6 @@ export class Tree {
     return dfs(root);
   }
 
-  // MUAHAHAHA
   async findWeaknesses(startingPosition, color) {
     await this.evalTree(startingPosition);
     this.chess = new Chess(startingPosition);
@@ -146,8 +145,6 @@ export class Tree {
     const weaknesses = [];
 
     const dfs = async (node, parent, turn) => {
-      // check for jumps of 1.1
-      // check if the previous position was the bad guy's position
       if (!parent) {
         for (let child of node.children) {
           dfs(child, node, turn === "white" ? "black" : "white");

@@ -1,5 +1,5 @@
 export default class Engine {
-  constructor(stockfishPath = "/stockfish/stockfish-17.js") {
+  constructor(stockfishPath = "/sf/stockfish-nnue-16.js") {
     this.engine = new Worker(stockfishPath);
     this.isReady = false;
     this.currentAnalysis = null;
@@ -38,9 +38,8 @@ export default class Engine {
             const lineNumber = parseInt(multipvMatch[1]);
             let score = parseInt(scoreMatch[1]);
 
-            // Normalize the score based on side to move
             if (this.currentAnalysis.sideToMove === "b") {
-              score = -score; // Invert score if Black to move
+              score = -score;
             }
 
             const depth = parseInt(depthMatch[1]);
@@ -118,5 +117,26 @@ export default class Engine {
   dispose() {
     this._sendCommand("quit");
     this.engine.terminate();
+  }
+}
+
+export async function analyzePosition(fen, depth = 15) {
+  const engine = new Engine();
+
+  try {
+    const analysis = await engine.analyzePosition(fen, depth);
+
+    // console.log("Analysis Results:");
+    // analysis.forEach((line) => {
+    // console.log(
+    //   `Line ${line.line}: Score ${line.score / 100}, Centipawn Loss: ${
+    //     line.centipawnLoss / 100
+    //   }`
+    // );
+    // console.log(`   Moves: ${line.moves.slice(0, 5).join(" ")}...`);
+    // });
+    return analysis;
+  } finally {
+    engine.dispose();
   }
 }

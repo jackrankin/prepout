@@ -36,9 +36,18 @@
       <div class="right-section">
 
         <div class="evaluation-lines">
-          <div id="line1"></div>
-          <div id="line2"></div>
-          <div id="line3"></div>
+          <div class="line" id="line1">
+            <div id="score1"></div>
+            <div class="move-list" id="moves1"></div>
+          </div>
+          <div class="line" id="line2">
+            <div id="score2"></div>
+            <div class="move-list" id="moves2"></div>
+          </div>
+          <div class="line" id="line3">
+            <div id="score3"></div>
+            <div class="move-list" id="moves3"></div>
+          </div>
         </div>
 
         <!-- SEARCH PARAMETERS -->
@@ -51,7 +60,6 @@
 
           <!-- OPP COLOR -->
           <div>
-            as :
             <button id="colorToggle" style="cursor: pointer">
               <svg width="17" height="17" viewBox="0 0 24 24" id="queenIcon">
                 <path fill="black" stroke="black" stroke-width="2"
@@ -62,7 +70,6 @@
 
           <!-- WEBSITE ORIGIN -->
           <span>
-            on :
             <select id="websiteOrigin" style="padding: 5px; font-size: 12px; border-radius: 5px">
               <option value="chesscom">Chess.com</option>
               <option value="lichess">Lichess</option>
