@@ -31,14 +31,12 @@ engine.onEvaluationUpdate = (evaluations, analysisId) => {
         index
       ].innerText = `${scorePrefix}${scoreValue} (d${line.depth})`;
 
-      // Set appropriate CSS class
       if (line.score >= 0) {
         evalScores[index].className = "white-advantage";
       } else {
         evalScores[index].className = "black-advantage";
       }
 
-      // Format the moves with optional centipawn loss
       let moveStr = line.moves.slice(0, 10).join(" ");
       if (line.line > 1 && line.centipawnLoss > 0) {
         moveStr += ` (${line.centipawnLoss}cp)`;
@@ -79,7 +77,6 @@ export const chess = new Chess();
 const moveHistory = [{ fen: chess.fen(), move: null }];
 let currentMoveIndex = 0;
 
-// Clear evaluation display
 function clearEvaluation() {
   for (let i = 0; i < 3; i++) {
     evalScores[i].innerText = "...";
@@ -88,20 +85,11 @@ function clearEvaluation() {
   }
 }
 
-// Start analysis of current position
-async function analyzeCurrentPosition(fen, depth = 17) {
-  // Clear previous evaluation display while waiting for new analysis
+async function analyzeCurrentPosition(fen, depth = 25) {
   clearEvaluation();
-
-  // Update the current analysis ID
-  currentAnalysisId = engine.analysisId + 1; // Pre-increment to match what the engine will use
-
+  currentAnalysisId = engine.analysisId + 1;
   try {
-    // Start real-time evaluation
     const results = await engine.analyzePosition(fen, depth);
-
-    // Process final results if needed
-    console.log("Final analysis complete:", results);
   } catch (e) {
     console.log("Engine analysis error:", e);
   }

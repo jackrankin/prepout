@@ -102,7 +102,7 @@ export default class RealTimeEngine {
     });
   }
 
-  async analyzePosition(fen, depth = 20) {
+  async analyzePosition(fen, depth = 25) {
     await this.waitForReady();
     await this._stopAnalysis();
 

@@ -1,6 +1,6 @@
 // THIS FILE IS GOING TO PARSE THE PGN' AND MAKE TREES OUT OF THEM
 import { Chess } from "chess.js";
-import { getEval } from "./fetch";
+import { analyzeFen } from "./search_engine";
 
 function getMoveFromFens(fenA, fenB) {
   if (!fenA || !fenB || typeof fenA !== "string" || typeof fenB !== "string") {
@@ -49,7 +49,7 @@ export class Node {
   }
 }
 
-export class Weakness {
+export class Move {
   constructor(positionNode, resultingNode, move, occurences, evalChange) {
     this.positionNode = positionNode;
     this.resultingNode = resultingNode;
@@ -115,81 +115,54 @@ export class Tree {
     }
   }
 
-  async evalTree(startingPosition) {
-    if (startingPosition === "") {
-      startingPosition =
-        "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-    }
+  async evalTree(
+    startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
+    weaknessDepth = 5,
+    playerColor = "black"
+  ) {
     if (!this.fenNode.has(startingPosition)) {
-      return null;
+      return [];
     }
+
+    this.chess = new Chess(startingPosition);
     const root = this.fenNode.get(startingPosition);
 
-    console.log("POSITION APPEARED", root.fen, root.count);
+    console.log("OPP HAD THIS STARTING POSITION", root.count, "TIMES");
+    const moves = [];
 
-    const dfs = async (node) => {
-      node.eval = await getEval(node.fen);
-
-      for (let child of node.children) {
-        await dfs(child);
-      }
-    };
-
-    return dfs(root);
-  }
-
-  async findWeaknesses(startingPosition, color) {
-    await this.evalTree(startingPosition);
-    this.chess = new Chess(startingPosition);
-
-    const weaknesses = [];
-
-    const dfs = async (node, parent, turn) => {
-      if (!parent) {
-        for (let child of node.children) {
-          dfs(child, node, turn === "white" ? "black" : "white");
-        }
-
+    const dfs = async (node, turn, depth) => {
+      if (depth === weaknessDepth) {
         return;
       }
 
-      if (
-        node.eval - parent.eval >= 1.1 &&
-        turn === "white" &&
-        color === "black" &&
-        node.eval > 1
-      ) {
-        const w = new Weakness(
-          parent,
+      const result = await analyzeFen(node.fen);
+      node.eval = result.score;
+      console.log(node.fen, result.score);
+
+      if (turn !== playerColor && node.parent) {
+        const move = new Move(
           node,
-          getMoveFromFens(parent.fen, node.fen),
+          node.parent,
+          getMoveFromFens(node.fen, node.parent.fen),
           node.count,
-          node.eval - parent.eval
+          node.eval - node.parent.eval
         );
-        weaknesses.push(w);
-      } else if (
-        node.eval - parent.eval <= -1.1 &&
-        turn === "black" &&
-        color === "white" &&
-        node.eval <= -1.1
-      ) {
-        const w = new Weakness(
-          parent,
-          node,
-          getMoveFromFens(parent.fen, node.fen),
-          node.count,
-          node.eval - parent.eval
-        );
-        weaknesses.push(w);
+        moves.push(move);
       }
 
       for (let child of node.children) {
-        dfs(child, node, turn === "white" ? "black" : "white");
+        await dfs(child, turn === "white" ? "black" : "white", depth + 1);
       }
     };
 
-    dfs(startingPosition, null, this.chess.turn() === "w" ? "white" : "black");
+    dfs(root, this.chess.turn() === "w" ? "white" : "black", 0);
+    moves.sort(
+      (a, b) =>
+        Math.abs(b.evalChange) * b.count - Math.abs(a.evalChange) * a.count
+    );
 
-    return weaknesses;
+    moves = moves.slice(1, 5);
+    console.log(moves);
+    return moves;
   }
 }
