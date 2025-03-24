@@ -1,7 +1,7 @@
 import "./style.css";
 import { Chessground } from "chessground";
 import { Chess } from "chess.js";
-import { analyzePosition } from "./engine";
+import RealTimeEngine from "./realtime_engine";
 
 const boardElement = document.getElementById("board");
 const evalScores = [
@@ -15,6 +15,38 @@ const evalLines = [
   document.getElementById("moves2"),
   document.getElementById("moves3"),
 ];
+
+const engine = new RealTimeEngine();
+let currentAnalysisId = 0;
+
+engine.onEvaluationUpdate = (evaluations, analysisId) => {
+  if (analysisId !== currentAnalysisId) return;
+
+  evaluations.forEach((line) => {
+    const index = line.line - 1;
+    if (index >= 0 && index < 3) {
+      const scoreValue = (line.score / 100).toFixed(2);
+      const scorePrefix = line.score >= 0 ? "+" : "";
+      evalScores[
+        index
+      ].innerText = `${scorePrefix}${scoreValue} (d${line.depth})`;
+
+      // Set appropriate CSS class
+      if (line.score >= 0) {
+        evalScores[index].className = "white-advantage";
+      } else {
+        evalScores[index].className = "black-advantage";
+      }
+
+      // Format the moves with optional centipawn loss
+      let moveStr = line.moves.slice(0, 10).join(" ");
+      if (line.line > 1 && line.centipawnLoss > 0) {
+        moveStr += ` (${line.centipawnLoss}cp)`;
+      }
+      evalLines[index].innerText = moveStr;
+    }
+  });
+};
 
 function resizeBoard() {
   const viewportWidth = window.innerWidth;
@@ -47,6 +79,34 @@ export const chess = new Chess();
 const moveHistory = [{ fen: chess.fen(), move: null }];
 let currentMoveIndex = 0;
 
+// Clear evaluation display
+function clearEvaluation() {
+  for (let i = 0; i < 3; i++) {
+    evalScores[i].innerText = "...";
+    evalScores[i].className = "";
+    evalLines[i].innerText = "";
+  }
+}
+
+// Start analysis of current position
+async function analyzeCurrentPosition(fen, depth = 17) {
+  // Clear previous evaluation display while waiting for new analysis
+  clearEvaluation();
+
+  // Update the current analysis ID
+  currentAnalysisId = engine.analysisId + 1; // Pre-increment to match what the engine will use
+
+  try {
+    // Start real-time evaluation
+    const results = await engine.analyzePosition(fen, depth);
+
+    // Process final results if needed
+    console.log("Final analysis complete:", results);
+  } catch (e) {
+    console.log("Engine analysis error:", e);
+  }
+}
+
 function updateBoard() {
   const dests = new Map();
   for (let i = 0; i < 8; i++) {
@@ -69,27 +129,7 @@ function updateBoard() {
 
   console.log(chess.fen());
 
-  analyzePosition(chess.fen(), 17)
-    .then((lines) => {
-      for (let i in lines) {
-        let line = lines[i];
-        evalScores[i].innerText = `${line.score >= 0 ? "+" : ""}${
-          line.score / 100
-        }`;
-
-        if (line.score >= 0) {
-          evalScores[i].className = "white-advantage";
-        } else {
-          evalScores[i].className = "black-advantage";
-        }
-
-        let moveStr = line.moves.slice(0, 10).join(" ");
-        evalLines[i].innerText = moveStr;
-      }
-    })
-    .catch((e) => {
-      console.log("engine loading failure", e);
-    });
+  analyzeCurrentPosition(chess.fen(), 25);
 
   ground.set({
     fen: chess.fen(),
@@ -134,27 +174,7 @@ function navigateMove(direction) {
 
   chess.load(moveHistory[currentMoveIndex].fen);
 
-  analyzePosition(chess.fen(), 15)
-    .then((lines) => {
-      for (let i in lines) {
-        let line = lines[i];
-
-        evalScores[i].innerText =
-          `${line.score >= 0 ? "+" : ""}` + `${(line.score / 100).toFixed(2)}`;
-
-        if (line.score >= 0) {
-          evalScores[i].className = "white-advantage";
-        } else {
-          evalScores[i].className = "black-advantage";
-        }
-
-        let moveStr = line.moves.slice(0, 10).join(" ");
-        evalLines[i].innerText = moveStr;
-      }
-    })
-    .catch((e) => {
-      console.log("engine loading failure", e);
-    });
+  analyzeCurrentPosition(chess.fen(), 25);
 
   const lastMove = moveHistory[currentMoveIndex].move;
   const lastMoveHighlight = lastMove ? [lastMove.from, lastMove.to] : undefined;
@@ -203,4 +223,11 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
-updateBoard();
+window.addEventListener("beforeunload", () => {
+  engine.dispose();
+});
+
+engine.waitForReady().then(() => {
+  console.log("Engine ready");
+  updateBoard();
+});
