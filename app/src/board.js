@@ -115,8 +115,6 @@ function updateBoard() {
     }
   }
 
-  console.log(chess.fen());
-
   analyzeCurrentPosition(chess.fen(), 25);
 
   ground.set({
@@ -129,8 +127,6 @@ function updateBoard() {
       events: {
         after: (orig, dest) => {
           const move = chess.move({ from: orig, to: dest });
-          console.log(move.lan);
-          console.log("Current position (FEN):", chess.fen());
 
           if (currentMoveIndex < moveHistory.length - 1) {
             moveHistory.splice(currentMoveIndex + 1);

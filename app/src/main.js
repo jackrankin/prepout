@@ -35,7 +35,7 @@ searching.addEventListener("click", async () => {
     const tree = new Tree(games.pgns);
     tree.parsePGNs();
 
-    const weaknesses = await tree.findWeaknesses(
+    const weaknesses = await tree.evalTree(
       chess.fen(),
       "userIsWhite" ? "black" : "white",
       5

@@ -1,5 +1,5 @@
 const getChesscomGames = async (username, color, lastXdays) => {
-  const url = `https://api.chess.com/pub/player/${username}/games/2025/02`;
+  const url = `https://api.chess.com/pub/player/${username}/games/2025/03`;
 
   try {
     const response = await fetch(url);

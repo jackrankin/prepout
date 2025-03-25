@@ -115,10 +115,11 @@ export class Tree {
     }
   }
 
+  // playerColor = 'black' means we are finding moves to paly AGAINST black
   async evalTree(
     startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
-    weaknessDepth = 5,
-    playerColor = "black"
+    playerColor = "black",
+    weaknessDepth = 5
   ) {
     if (!this.fenNode.has(startingPosition)) {
       return [];
@@ -127,8 +128,12 @@ export class Tree {
     this.chess = new Chess(startingPosition);
     const root = this.fenNode.get(startingPosition);
 
-    console.log("OPP HAD THIS STARTING POSITION", root.count, "TIMES");
     const moves = [];
+    const weaknessThresholds = {
+      blunder: 1.5,
+      mistake: 1.0,
+      inaccuracy: 0.5,
+    };
 
     const dfs = async (node, turn, depth) => {
       if (depth === weaknessDepth) {
@@ -136,17 +141,39 @@ export class Tree {
       }
 
       const result = await analyzeFen(node.fen);
-      node.eval = result.score;
-      console.log(node.fen, result.score);
+      node.eval = result.score / 100;
 
       if (turn !== playerColor && node.parent) {
         const move = new Move(
-          node,
           node.parent,
-          getMoveFromFens(node.fen, node.parent.fen),
+          node,
+          getMoveFromFens(node.parent.fen, node.fen),
           node.count,
           node.eval - node.parent.eval
         );
+
+        const absEvalChange = Math.abs(move.evalChange);
+        let weaknessType = "inaccuracy";
+
+        if (
+          (playerColor === "black" &&
+            move.evalChange > weaknessThresholds.blunder) ||
+          (playerColor === "white" &&
+            move.evalChange < -weaknessThresholds.blunder)
+        ) {
+          weaknessType = "blunder";
+        } else if (
+          (playerColor === "black" &&
+            move.evalChange > weaknessThresholds.mistake) ||
+          (playerColor === "white" &&
+            move.evalChange < -weaknessThresholds.mistake)
+        ) {
+          weaknessType = "mistake";
+        }
+
+        move.weaknessType = weaknessType;
+        move.evalChangeStrength = absEvalChange;
+
         moves.push(move);
       }
 
@@ -155,14 +182,29 @@ export class Tree {
       }
     };
 
-    dfs(root, this.chess.turn() === "w" ? "white" : "black", 0);
-    moves.sort(
-      (a, b) =>
-        Math.abs(b.evalChange) * b.count - Math.abs(a.evalChange) * a.count
-    );
-
-    moves = moves.slice(1, 5);
+    await dfs(root, this.chess.turn() === "w" ? "white" : "black", 0);
     console.log(moves);
-    return moves;
+
+    const rankedWeaknesses = moves.sort((a, b) => {
+      const weaknessTypeOrder = {
+        blunder: 3,
+        mistake: 2,
+        inaccuracy: 1,
+      };
+
+      const aScore =
+        weaknessTypeOrder[a.weaknessType] * 1000 +
+        a.evalChangeStrength * 100 +
+        a.occurences;
+
+      const bScore =
+        weaknessTypeOrder[b.weaknessType] * 1000 +
+        b.evalChangeStrength * 100 +
+        b.occurences;
+
+      return bScore - aScore;
+    });
+
+    return rankedWeaknesses.slice(0, 5);
   }
 }

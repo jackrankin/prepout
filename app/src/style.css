@@ -4,7 +4,7 @@
   color: gray;
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  background-color: #2e2e2e;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -109,6 +109,16 @@ button, input, select, option {
   padding-right: 5px;
   margin-right: 10px;
   border-radius: 5px;
+  color: #ffffff;
+}
+
+.hover-transition {
+  color: #828690;
+  transition: color 0.1s ease-in-out;
+  cursor: pointer;
+}
+
+.hover-transition:hover {
   color: #ffffff;
 }
 
