@@ -76,27 +76,6 @@ const getLichessGames = async (username, color, lastXdays) => {
   }
 };
 
-export const getEval = async (fen) => {
-  const url = `https://lichess.org/api/cloud-eval?fen=${fen}`;
-  console.log(url);
-
-  try {
-    const response = await fetch(url, {
-      method: "GET",
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch data");
-    }
-    const result = await response.json();
-
-    return result.pvs[0].cp / 100;
-  } catch (error) {
-    console.error("error evaluating position", error);
-    return 0;
-  }
-};
-
 export const getUserGames = (website, username, color, days) => {
   if (website === "chesscom") {
     return getChesscomGames(username, color, days);

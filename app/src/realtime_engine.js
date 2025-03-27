@@ -1,3 +1,5 @@
+// this engine is just for whatever is on the board
+
 export default class RealTimeEngine {
   constructor(stockfishPath = "/sf/stockfish-nnue-16.js") {
     this.engine = new Worker(stockfishPath);
@@ -6,7 +8,7 @@ export default class RealTimeEngine {
     this.pendingResolve = null;
     this.lastEvaluations = {};
     this.onEvaluationUpdate = null;
-    this.analysisId = 0; // Used to track and cancel outdated analyses
+    this.analysisId = 0;
     this._setupEngine();
     this._setupListeners();
   }

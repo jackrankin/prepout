@@ -35,7 +35,12 @@
       <!-- RIGHT SECTION -->
       <div class="right-section">
 
+        <!-- EVALUATION -->
         <div class="evaluation-lines">
+          <div class="engine-evaluation">
+            <div id="evaluation-score" class="evaluation-score"></div>
+            <div id="engine-depth" class="engine-depth"></div>
+          </div>
           <div class="line" id="line1">
             <div id="score1"></div>
             <div class="move-list" id="moves1"></div>
@@ -49,6 +54,26 @@
             <div class="move-list" id="moves3"></div>
           </div>
         </div>
+
+        <!-- MOVE EXPLORER -->
+        <div id="explorer-container" class="explorer-container">
+          <ul id="explorer-move-list" class="explorer-move-list">
+            <li>
+              <div>
+                e4
+              </div>
+              <div>
+                count
+              </div>
+              <div>
+                win %
+              </div>
+            </li>
+            <li>d4</li>
+            <li>c4</li>
+          </ul>
+        </div>
+
 
         <!-- SEARCH PARAMETERS -->
         <div class="search-parameters">
@@ -98,7 +123,7 @@
   </footer>
 
   <script type="module" src="/src/board.js"></script>
-  <script type="module" src="/src/main.js"></script>
+  <script type="module" src="/src/lookup.js"></script>
 </body>
 
 </html>

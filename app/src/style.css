@@ -1,6 +1,6 @@
 :root {
   font-family: "Consolas", monospace;
-  font-weight: 400;
+  font-weight: bolder;
   color: gray;
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
@@ -10,6 +10,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 html,
 body {
   display: flex;
@@ -20,6 +21,7 @@ body {
   margin: 0;
   padding: 0;
 }
+
 .content {
   flex: 1;
   display: flex;
@@ -27,23 +29,27 @@ body {
   align-items: center;
   flex-direction: column;
 }
+
 footer {
   background-color: #1e1e1e;
   padding: 10px;
   text-align: center;
   width: 100%;
 }
+
 button, input, select, option {
   font-family: "Consolas", monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 .navbar {
   padding: 10px;
   background-color: #1e1e1e;
   font-size: 20px;
   text-align: center;
 }
+
 .footer {
   background-color: #1e1e1e;
   padding: 10px;
@@ -51,22 +57,53 @@ button, input, select, option {
   font-size: 20px;
   width: 100%;
 }
+
 .right-section {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   background-color: #1e1e1e;
   padding: 2rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
   border-radius: 1rem;
 }
+
 .search-parameters {
   display: flex;
   justify-content: center;
   gap: 1rem;
 }
 
+.engine-evaluation {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px; /* Adds some space between the score and depth */
+}
+
+.evaluation-score {
+  font-size: 26px;
+  width: min-content;
+  padding: 3px;
+  margin: 3px;
+  font-weight: bolder;
+  border-radius: 5px;
+  color: white; /* Added for better readability */
+}
+
+.engine-depth {
+  font-size: 12px;
+  padding: 3px;
+  margin: 3px;
+  font-weight: bolder;
+  border-radius: 5px;
+  color: white; /* Added for better readability */
+}
+
 .line {
   font-size: 14px;
+  font-weight: bolder;
   padding: 5px;
   margin: 5px;
   width: 420px;
@@ -89,7 +126,7 @@ button, input, select, option {
 }
 
 .white-advantage {
-  font-weight: 400;
+  font-weight: bolder;
   background-color: #ffffff;
   margin: 2px;
   padding: 2px;
@@ -121,6 +158,36 @@ button, input, select, option {
 .hover-transition:hover {
   color: #ffffff;
 }
+
+.explorer-container {
+  width: 100%;
+  background: #1e1e1e;
+  border-radius: 8px;
+  padding: 10px;
+  font-family: Arial, sans-serif;
+}
+
+.explorer-move-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.explorer-move-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 4px;
+  color: #ddd;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.explorer-move-list li:hover {
+  background: #333;
+}
+
 
 @media (max-width: 1130px) {
   .search-parameters {

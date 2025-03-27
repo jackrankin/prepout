@@ -4,6 +4,10 @@ import { Chess } from "chess.js";
 import RealTimeEngine from "./realtime_engine";
 
 const boardElement = document.getElementById("board");
+
+const engineEvaluation = document.getElementById("evaluation-score");
+const engineDepth = document.getElementById("engine-depth");
+
 const evalScores = [
   document.getElementById("score1"),
   document.getElementById("score2"),
@@ -21,20 +25,27 @@ let currentAnalysisId = 0;
 
 engine.onEvaluationUpdate = (evaluations, analysisId) => {
   if (analysisId !== currentAnalysisId) return;
+  let mx = null;
+  let depth = null;
+  let prefix = null;
 
   evaluations.forEach((line) => {
     const index = line.line - 1;
     if (index >= 0 && index < 3) {
       const scoreValue = (line.score / 100).toFixed(2);
       const scorePrefix = line.score >= 0 ? "+" : "";
-      evalScores[
-        index
-      ].innerText = `${scorePrefix}${scoreValue} (d${line.depth})`;
+      evalScores[index].innerText = `${scorePrefix}${scoreValue}`;
 
       if (line.score >= 0) {
         evalScores[index].className = "white-advantage";
       } else {
         evalScores[index].className = "black-advantage";
+      }
+
+      if (mx === null) {
+        prefix = scorePrefix;
+        mx = scoreValue;
+        depth = line.depth;
       }
 
       let moveStr = line.moves.slice(0, 10).join(" ");
@@ -44,6 +55,8 @@ engine.onEvaluationUpdate = (evaluations, analysisId) => {
       evalLines[index].innerText = moveStr;
     }
   });
+  engineEvaluation.innerText = `${prefix}${mx}`;
+  engineDepth.innerText = `(d=${depth})`;
 };
 
 function resizeBoard() {
@@ -63,13 +76,6 @@ const config = {
 };
 
 const board = Chessground(boardElement, config);
-
-setTimeout(() => {
-  const cgBoard = boardElement.querySelector(".cg-board");
-  if (cgBoard) {
-    cgBoard.style.borderRadius = "inherit";
-  }
-}, 100);
 
 export const ground = Chessground(boardElement, config);
 export const chess = new Chess();
