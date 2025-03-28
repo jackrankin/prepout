@@ -79,7 +79,8 @@ button, input, select, option {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 10px; /* Adds some space between the score and depth */
+  gap: 10px;
+  margin-left: 1rem;
 }
 
 .evaluation-score {
@@ -89,7 +90,7 @@ button, input, select, option {
   margin: 3px;
   font-weight: bolder;
   border-radius: 5px;
-  color: white; /* Added for better readability */
+  color: white; 
 }
 
 .engine-depth {
@@ -98,7 +99,7 @@ button, input, select, option {
   margin: 3px;
   font-weight: bolder;
   border-radius: 5px;
-  color: white; /* Added for better readability */
+  color: white; 
 }
 
 .line {

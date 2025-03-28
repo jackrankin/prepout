@@ -1,4 +1,5 @@
-// THIS FILE IS GOING TO PARSE THE PGN' AND MAKE TREES OUT OF THEM
+// parse pgns into a tree
+
 import { Chess } from "chess.js";
 import { analyzeFen } from "./search_engine";
 

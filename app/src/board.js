@@ -22,6 +22,7 @@ const evalLines = [
 
 const engine = new RealTimeEngine();
 let currentAnalysisId = 0;
+let maxDepth = 35;
 
 engine.onEvaluationUpdate = (evaluations, analysisId) => {
   if (analysisId !== currentAnalysisId) return;
@@ -56,7 +57,7 @@ engine.onEvaluationUpdate = (evaluations, analysisId) => {
     }
   });
   engineEvaluation.innerText = `${prefix}${mx}`;
-  engineDepth.innerText = `(d=${depth})`;
+  engineDepth.innerText = `(d=${depth}/${maxDepth})`;
 };
 
 function resizeBoard() {
@@ -91,7 +92,7 @@ function clearEvaluation() {
   }
 }
 
-async function analyzeCurrentPosition(fen, depth = 25) {
+async function analyzeCurrentPosition(fen, depth = maxDepth) {
   clearEvaluation();
   currentAnalysisId = engine.analysisId + 1;
   try {
@@ -121,7 +122,7 @@ function updateBoard() {
     }
   }
 
-  analyzeCurrentPosition(chess.fen(), 25);
+  analyzeCurrentPosition(chess.fen(), maxDepth);
 
   ground.set({
     fen: chess.fen(),
