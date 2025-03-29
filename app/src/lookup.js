@@ -4,18 +4,19 @@ import { chess } from "./board";
 import { getUserGames } from "./fetch";
 import { Tree } from "./search";
 
-const username = document.getElementById("username");
-const websiteOrigin = document.getElementById("websiteOrigin");
-const colorToggle = document.getElementById("colorToggle");
-const icon = document.getElementById("queenIcon");
-const searching = document.getElementById("startSearch");
-
-let userIsWhite = true;
+const elements = {
+  username: document.getElementById("username"),
+  websiteOrigin: document.getElementById("websiteOrigin"),
+  colorToggle: document.getElementById("colorToggle"),
+  icon: document.getElementById("queenIcon"),
+  searching: document.getElementById("startSearch"),
+  userIsWhite: true,
+};
 
 colorToggle.addEventListener("click", () => {
-  userIsWhite = !userIsWhite;
+  elements.userIsWhite = !elements.userIsWhite;
   ground.toggleOrientation();
-  icon.innerHTML = userIsWhite
+  icon.innerHTML = elements.userIsWhite
     ? `<path fill="black" stroke="black" stroke-width="2" d="M12 2L15 8H9L12 2ZM6 8L9 22H15L18 8H6ZM3 22H21V24H3V22Z"/>`
     : `<path fill="white" stroke="black" stroke-width="2" d="M12 2L15 8H9L12 2ZM6 8L9 22H15L18 8H6ZM3 22H21V24H3V22Z"/>`;
 });
@@ -25,9 +26,9 @@ searching.addEventListener("click", async () => {
 
   try {
     const games = await getUserGames(
-      websiteOrigin.value,
+      elements.websiteOrigin.value,
       "jackrankin",
-      userIsWhite ? "black" : "white",
+      elements.userIsWhite ? "black" : "white",
       100
     );
 

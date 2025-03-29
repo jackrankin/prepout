@@ -23,13 +23,7 @@
 
       <!-- BOARD -->
       <div id="container" style="display: flex; justify-content: center; display: flex; flex-direction: column;">
-        <!-- <div style="text-align: center; padding: 10px;">
-          OPPONENT
-        </div> -->
         <div id="board" style="height: 75vh; width: 100%"></div>
-        <!-- <div style="text-align: center; padding: 10px;">
-          YOU
-        </div> -->
       </div>
 
       <!-- RIGHT SECTION -->
@@ -39,7 +33,10 @@
         <div class="evaluation-lines">
           <div class="engine-evaluation">
             <div id="evaluation-score" class="evaluation-score"></div>
-            <div id="engine-depth" class="engine-depth"></div>
+            <div class="engine-details">
+              <div class="engine-name">SF16-nnue</div>
+              <div id="engine-depth" class="engine-depth"></div>
+            </div>
           </div>
           <div class="line" id="line1">
             <div id="score1"></div>
@@ -122,8 +119,8 @@
     </div>
   </footer>
 
-  <script type="module" src="/src/board.js"></script>
-  <script type="module" src="/src/lookup.js"></script>
+  <!-- <script type="module" src="/src/board.js"></script> -->
+  <script type="module" src="/src/main.js"></script>
 </body>
 
 </html>
