@@ -37,13 +37,17 @@ footer {
   width: 100%;
 }
 
-button, input, select, option {
+button,
+input,
+select,
+option {
   font-family: "Consolas", monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 .navbar {
+  color: #c3c5c8;
   padding: 10px;
   background-color: #1e1e1e;
   font-size: 20px;
@@ -58,6 +62,12 @@ button, input, select, option {
   width: 100%;
 }
 
+.middle-section {
+  display: flex;
+  gap: 5px;
+  justify-content: center;
+}
+
 .right-section {
   display: flex;
   flex-direction: column;
@@ -66,7 +76,7 @@ button, input, select, option {
   padding: 2rem;
   padding-top: 1rem;
   padding-bottom: 1rem;
-  border-radius: 1rem;
+  border-radius: 10px;
 }
 
 .search-parameters {
@@ -90,7 +100,7 @@ button, input, select, option {
   margin: 3px;
   font-weight: bolder;
   border-radius: 5px;
-  color: white; 
+  color: white;
 }
 
 .engine-depth {
@@ -99,7 +109,7 @@ button, input, select, option {
   margin: 3px;
   font-weight: bolder;
   border-radius: 5px;
-  color: white; 
+  color: white;
 }
 
 .line {
@@ -123,7 +133,7 @@ button, input, select, option {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  max-width: 100%; 
+  max-width: 100%;
 }
 
 .white-advantage {
@@ -189,20 +199,19 @@ button, input, select, option {
   background: #333;
 }
 
-
 @media (max-width: 1130px) {
   .search-parameters {
     flex-direction: column;
     align-items: center;
   }
-  
+
   .search-parameters > div,
   .search-parameters > span {
     width: 100%;
     margin-bottom: 0.5rem;
     text-align: center;
   }
-  
+
   .search-parameters input,
   .search-parameters select,
   .search-parameters button#startSearch {

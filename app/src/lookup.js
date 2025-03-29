@@ -3,7 +3,6 @@ import { ground } from "./board";
 import { chess } from "./board";
 import { getUserGames } from "./fetch";
 import { Tree } from "./search";
-import { analyzeFen } from "./search_engine";
 
 const username = document.getElementById("username");
 const websiteOrigin = document.getElementById("websiteOrigin");
