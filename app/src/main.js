@@ -7,7 +7,13 @@ import Explorer from "./explorer";
 
 // DOM elements
 const elements = {
+  username: document.getElementById("username"),
+  websiteOrigin: document.getElementById("websiteOrigin"),
+  colorToggle: document.getElementById("colorToggle"),
+  icon: document.getElementById("queenIcon"),
+  searching: document.getElementById("startSearch"),
   board: document.getElementById("board"),
+
   engineEvaluation: document.getElementById("evaluation-score"),
   engineDepth: document.getElementById("engine-depth"),
   evalScores: [
@@ -20,11 +26,13 @@ const elements = {
     document.getElementById("moves2"),
     document.getElementById("moves3"),
   ],
+
   explorerMoveList: document.getElementById("explorer-move-list"),
 };
 
 // App state
 const state = {
+  userIsWhite: true,
   engine: new RealTimeEngine(),
   chess: new Chess(),
   ground: null,
@@ -287,6 +295,14 @@ async function initApp() {
   // Set up event listeners
   window.addEventListener("resize", resizeBoard);
 
+  elements.colorToggle.addEventListener("click", () => {
+    state.userIsWhite = !state.userIsWhite;
+    state.ground.toggleOrientation();
+    elements.icon.innerHTML = state.userIsWhite
+      ? `<path fill="white" stroke="black" stroke-width="2" d="M12 2L15 8H9L12 2ZM6 8L9 22H15L18 8H6ZM3 22H21V24H3V22Z"/>`
+      : `<path fill="black" stroke="black" stroke-width="2" d="M12 2L15 8H9L12 2ZM6 8L9 22H15L18 8H6ZM3 22H21V24H3V22Z"/>`;
+  });
+
   document.addEventListener("keydown", (e) => {
     if (e.key === "ArrowLeft") {
       navigateMove("prev");
@@ -294,6 +310,19 @@ async function initApp() {
     } else if (e.key === "ArrowRight") {
       navigateMove("next");
       e.preventDefault();
+    }
+  });
+
+  elements.searching.addEventListener("click", async () => {
+    try {
+      initializeExplorer(
+        elements.username.value,
+        elements.websiteOrigin.value,
+        state.userIsWhite ? "white" : "black",
+        30
+      );
+    } catch (error) {
+      console.error("Error fetching games:", error);
     }
   });
 

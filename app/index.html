@@ -22,8 +22,8 @@
     <div class="middle-section">
 
       <!-- BOARD -->
-      <div id="container" style="display: flex; justify-content: center; display: flex; flex-direction: column;">
-        <div id="board" style="height: 75vh; width: 100%"></div>
+      <div id="container" class="board-container">
+        <div id="board" class="board"></div>
       </div>
 
       <!-- RIGHT SECTION -->
@@ -38,36 +38,25 @@
               <div id="engine-depth" class="engine-depth"></div>
             </div>
           </div>
-          <div class="line" id="line1">
-            <div id="score1"></div>
-            <div class="move-list" id="moves1"></div>
-          </div>
-          <div class="line" id="line2">
-            <div id="score2"></div>
-            <div class="move-list" id="moves2"></div>
-          </div>
-          <div class="line" id="line3">
-            <div id="score3"></div>
-            <div class="move-list" id="moves3"></div>
+          <div class="engine-lines">
+            <div class="line" id="line1">
+              <div id="score1"></div>
+              <div class="move-list" id="moves1"></div>
+            </div>
+            <div class="line" id="line2">
+              <div id="score2"></div>
+              <div class="move-list" id="moves2"></div>
+            </div>
+            <div class="line" id="line3">
+              <div id="score3"></div>
+              <div class="move-list" id="moves3"></div>
+            </div>
           </div>
         </div>
 
         <!-- MOVE EXPLORER -->
         <div id="explorer-container" class="explorer-container">
           <ul id="explorer-move-list" class="explorer-move-list">
-            <li>
-              <div>
-                e4
-              </div>
-              <div>
-                count
-              </div>
-              <div>
-                win %
-              </div>
-            </li>
-            <li>d4</li>
-            <li>c4</li>
           </ul>
         </div>
 
@@ -77,26 +66,27 @@
 
           <!-- OPP USERNAME -->
           <div>
-            <input style="padding: 5px; font-size: 12px" type="text" id="username" placeholder="Opponent's username" />
+            <input class="username-input" style="padding: 5px; font-size: 12px;" type="text" id="username"
+              placeholder="username" />
           </div>
 
           <!-- OPP COLOR -->
           <div>
             <button id="colorToggle" style="cursor: pointer">
               <svg width="17" height="17" viewBox="0 0 24 24" id="queenIcon">
-                <path fill="black" stroke="black" stroke-width="2"
+                <path fill="white" stroke="black" stroke-width="2"
                   d="M12 2L15 8H9L12 2ZM6 8L9 22H15L18 8H6ZM3 22H21V24H3V22Z" />
               </svg>
             </button>
           </div>
 
           <!-- WEBSITE ORIGIN -->
-          <span>
+          <div>
             <select id="websiteOrigin" style="padding: 5px; font-size: 12px; border-radius: 5px">
               <option value="chesscom">Chess.com</option>
               <option value="lichess">Lichess</option>
             </select>
-          </span>
+          </div>
 
 
           <!-- SUBMIT BUTTON -->

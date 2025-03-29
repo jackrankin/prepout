@@ -1,6 +1,6 @@
 // explorer.js
 import { getUserGames } from "./fetch";
-import { Tree } from "./search";
+import { Tree } from "./tree";
 
 export default class Explorer {
   constructor(username, platform, color, fen, days) {
@@ -30,7 +30,7 @@ export default class Explorer {
       await this.tree.initialize();
 
       // Evaluate the tree for the starting position
-      await this._evalTree();
+      // await this._evalTree();
 
       this.isInitialized = true;
       this.isLoading = false;
@@ -127,44 +127,23 @@ export default class Explorer {
       return;
     }
 
-    // Create the move list
-    const moveList = document.createElement("div");
-    moveList.className = "explorer-move-list";
-
-    // Add header
-    const header = document.createElement("div");
-    header.className = "explorer-header";
-    header.innerHTML = `
-      <div class="header-move">Move</div>
-      <div class="header-games">Games</div>
-      <div class="header-score">Score</div>
-      <div class="header-eval">Eval</div>
-    `;
-    moveList.appendChild(header);
-
-    // Add moves
-    moves.forEach((move) => {
-      const moveElement = document.createElement("div");
-      moveElement.className = "explorer-move";
+    moves.forEach((move, idx) => {
+      const moveElement = document.createElement("li");
+      moveElement.className = `explorer-move-${idx % 2}`;
       moveElement.innerHTML = `
-        <div class="move-san">${move.san}</div>
-        <div class="move-games">${move.count}</div>
-        <div class="move-score">${Math.round(move.winPercentage)}%</div>
-        <div class="move-eval">${move.evaluation.toFixed(2)}</div>
+        <div style="width: 50px;">${move.san}</div>
+        <div style="width: 50px;">${move.count}</div>
+        <div style="width: 50px;">${Math.round(move.winPercentage)}%</div>
+        <div style="width: 50px;">${move.evaluation.toFixed(2)}</div>
       `;
-
-      // Add click event to make the move
       moveElement.addEventListener("click", () => {
-        // Dispatch a custom event that the main app can listen for
         const event = new CustomEvent("explorer-move-selected", {
           detail: { san: move.san, fen: move.fen },
         });
         document.dispatchEvent(event);
       });
 
-      moveList.appendChild(moveElement);
+      this.container.appendChild(moveElement);
     });
-
-    this.container.appendChild(moveList);
   }
 }

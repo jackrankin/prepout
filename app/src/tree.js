@@ -36,7 +36,7 @@ export class Tree {
 
     // Parse all PGNs
     if (Array.isArray(this.pgns)) {
-      await this.parsePGNs();
+      await this._parsePGNs();
       this.initialized = true;
       return this;
     } else {
@@ -94,7 +94,7 @@ export class Tree {
     }
   }
 
-  async parsePGNs() {
+  async _parsePGNs() {
     const pgnsArray = Array.isArray(this.pgns) ? this.pgns : [];
 
     for (let pgn of pgnsArray) {

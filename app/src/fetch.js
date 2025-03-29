@@ -21,7 +21,7 @@ const getChesscomGames = async (username, color, lastXdays) => {
 
     const pgns = games.map((game) => game.pgn);
 
-    return { pgns };
+    return pgns;
   } catch (error) {
     console.error("Error fetching games:", error);
     throw error;
@@ -69,7 +69,7 @@ const getLichessGames = async (username, color, lastXdays) => {
 
     const pgns = colorFilteredGames.map((game) => game.pgn);
 
-    return { pgns };
+    return pgns;
   } catch (error) {
     console.error("Error fetching games:", error);
     throw error;
