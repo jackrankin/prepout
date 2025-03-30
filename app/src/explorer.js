@@ -80,15 +80,6 @@ export default class Explorer {
     return this.getMovesForPosition();
   }
 
-  // Get the path from root to current position
-  getPathToCurrentPosition() {
-    if (!this.isInitialized || !this.tree) {
-      return [];
-    }
-
-    return this.tree.getPathToPosition(this.currentPosition);
-  }
-
   // Refresh explorer data (for example after changing filters)
   async refresh(username, platform, color, days) {
     if (username) this.username = username;

@@ -9,8 +9,8 @@ export class Node {
     this.parent = parent || null;
     this.children = [];
     this.eval = 0;
-    this.move = null; // Store the move that led to this position
-    this.san = null; // Store the SAN notation of the move
+    this.move = null;
+    this.san = null;
     this.whiteWins = 0;
     this.blackWins = 0;
     this.draws = 0;
@@ -31,10 +31,8 @@ export class Tree {
   }
 
   async initialize() {
-    // Wait for pgns to resolve if it's a promise
     this.pgns = await Promise.resolve(this.pgns);
 
-    // Parse all PGNs
     if (Array.isArray(this.pgns)) {
       await this._parsePGNs();
       this.initialized = true;
@@ -98,11 +96,9 @@ export class Tree {
     const pgnsArray = Array.isArray(this.pgns) ? this.pgns : [];
 
     for (let pgn of pgnsArray) {
-      // Handle different possible PGN formats
       if (typeof pgn === "string") {
         this.putPGN(pgn);
       } else if (pgn && typeof pgn === "object") {
-        // If pgn is an object with a pgn property and result property
         if (pgn.pgn) {
           this.putPGN(pgn.pgn, pgn.result);
         }
@@ -110,25 +106,34 @@ export class Tree {
     }
   }
 
-  // Get moves for a specific position
   getMovesForPosition(fen) {
     if (!this.initialized) {
       return [];
     }
 
-    // Make sure the FEN is normalized (sometimes there are trailing spaces)
     const normalizedFen = this._normalizeFen(fen);
+    console.log("Looking for moves for FEN:", normalizedFen);
 
-    // Check if we have the position in our tree
     if (!this.fenNode.has(normalizedFen)) {
+      console.log("FEN not found in position database!");
       return [];
     }
 
     const node = this.fenNode.get(normalizedFen);
+    console.log("Found node with", node.children.length, "children");
 
-    // Convert children to move list
-    return node.children
+    // Create a new Chess instance for validation
+    const tempChess = new Chess(normalizedFen);
+    const legalMoves = new Set(
+      tempChess.moves({ verbose: true }).map((m) => m.san)
+    );
+
+    const moves = node.children
       .map((child) => {
+        const isLegal = legalMoves.has(child.san);
+
+        console.log(`Move ${child.san} is ${isLegal ? "LEGAL" : "ILLEGAL"}`);
+
         const totalGames = child.count;
         const winPercentage = this._calculateWinPercentage(child);
 
@@ -141,21 +146,22 @@ export class Tree {
           whiteWins: child.whiteWins,
           blackWins: child.blackWins,
           draws: child.draws,
+          isLegal: isLegal, // Include this for debugging
         };
       })
-      .sort((a, b) => b.count - a.count); // Sort by popularity
+      .filter((m) => m.isLegal) // Remove illegal moves
+      .sort((a, b) => b.count - a.count);
+
+    return moves;
   }
 
-  // Evaluate the tree for a given starting position
   async evalTree(
     startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
   ) {
-    // Make sure pgns are parsed first
     if (!this.initialized) {
       await this.initialize();
     }
 
-    // Normalize the FEN
     const normalizedFen = this._normalizeFen(startingPosition);
 
     if (!this.fenNode.has(normalizedFen)) {
@@ -165,10 +171,8 @@ export class Tree {
     this.chess = new Chess(normalizedFen);
     const root = this.fenNode.get(normalizedFen);
 
-    // Evaluate positions in the tree
     const dfs = async (node, turn, depth) => {
       try {
-        // Only analyze if not already evaluated
         if (node.eval === 0) {
           const result = await analyzeFen(node.fen);
           node.eval = result.score / 100;
@@ -186,33 +190,7 @@ export class Tree {
     return root;
   }
 
-  // Get the path from root to a specific position
-  getPathToPosition(fen) {
-    const normalizedFen = this._normalizeFen(fen);
-
-    if (!this.fenNode.has(normalizedFen)) {
-      return [];
-    }
-
-    const path = [];
-    let currentNode = this.fenNode.get(normalizedFen);
-
-    while (currentNode && currentNode.parent) {
-      path.unshift({
-        fen: currentNode.fen,
-        san: currentNode.san,
-        evaluation: currentNode.eval,
-        count: currentNode.count,
-      });
-      currentNode = currentNode.parent;
-    }
-
-    return path;
-  }
-
-  // Helper method to extract result from PGN
   _extractResultFromPgn(pgn) {
-    // Common PGN result patterns
     if (pgn.includes("1-0")) {
       return "1-0";
     } else if (pgn.includes("0-1")) {
@@ -223,7 +201,6 @@ export class Tree {
     return null;
   }
 
-  // Helper method to update result counts
   _updateResultCounts(node, result) {
     if (result === "1-0") {
       node.whiteWins++;
@@ -234,27 +211,21 @@ export class Tree {
     }
   }
 
-  // Helper method to calculate win percentage for the side to move
   _calculateWinPercentage(node) {
     const totalGames = node.count;
     if (totalGames === 0) return 0;
 
-    // Determine side to move from FEN
     const chess = new Chess(node.fen);
     const sideToMove = chess.turn() === "w" ? "white" : "black";
 
     if (sideToMove === "white") {
-      // White to move, calculate white's winning percentage
       return ((node.whiteWins + node.draws / 2) / totalGames) * 100;
     } else {
-      // Black to move, calculate black's winning percentage
       return ((node.blackWins + node.draws / 2) / totalGames) * 100;
     }
   }
 
-  // Helper method to normalize FEN strings
   _normalizeFen(fen) {
-    // Some FENs might have extra spaces at the end
     return fen.trim();
   }
 }

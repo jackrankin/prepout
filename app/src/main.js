@@ -43,10 +43,8 @@ const state = {
   maxDepth: 35,
 };
 
-// Initialize the explorer
 async function initializeExplorer(username, platform, color, days) {
   try {
-    // Show loading state
     if (elements.explorerMoveList) {
       elements.explorerMoveList.innerHTML =
         '<div class="loading">Loading explorer data...</div>';
@@ -67,18 +65,12 @@ async function initializeExplorer(username, platform, color, days) {
   }
 }
 
-// Update the explorer display based on current position
 function updateExplorerDisplay() {
   if (!state.explorer) return;
-
-  // Update explorer data for the current position
   state.explorer.updatePosition(state.chess.fen());
-
-  // Render the explorer data
   state.explorer.render();
 }
 
-// Engine integration
 state.engine.onEvaluationUpdate = (evaluations, analysisId) => {
   if (analysisId !== state.currentAnalysisId) return;
 
