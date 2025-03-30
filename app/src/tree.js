@@ -9,8 +9,7 @@ export class Node {
     this.parent = parent || null;
     this.children = [];
     this.eval = 0;
-    this.move = null;
-    this.san = null;
+    this.move = null; // Store UCI move { from, to, promotion }
     this.whiteWins = 0;
     this.blackWins = 0;
     this.draws = 0;
@@ -32,7 +31,6 @@ export class Tree {
 
   async initialize() {
     this.pgns = await Promise.resolve(this.pgns);
-
     if (Array.isArray(this.pgns)) {
       await this._parsePGNs();
       this.initialized = true;
@@ -42,7 +40,15 @@ export class Tree {
     }
   }
 
-  putPGN(pgn, result) {
+  async _parsePGNs() {
+    const pgnsArray = Array.isArray(this.pgns) ? this.pgns : [];
+
+    for (let i = 0; i < pgnsArray.length; i++) {
+      this._putPGN(pgnsArray[i]);
+    }
+  }
+
+  _putPGN(pgn, result) {
     try {
       this.chess.loadPgn(pgn);
       const history = this.chess.history({ verbose: true });
@@ -62,6 +68,7 @@ export class Tree {
 
       for (const move of history) {
         this.chess.move(move);
+
         currentFen = this.chess.fen();
 
         let nextNode;
@@ -70,8 +77,11 @@ export class Tree {
           nextNode.count++;
         } else {
           nextNode = new Node(currentFen, 1, currentNode);
-          nextNode.move = move;
-          nextNode.san = move.san;
+          nextNode.move = {
+            from: move.from,
+            to: move.to,
+            promotion: move.promotion || null,
+          };
           this.fenNode.set(currentFen, nextNode);
         }
 
@@ -92,81 +102,56 @@ export class Tree {
     }
   }
 
-  async _parsePGNs() {
-    const pgnsArray = Array.isArray(this.pgns) ? this.pgns : [];
+  _getUciMoveFromFens(startFen, endFen) {
+    const chess = new Chess(startFen);
+    const possibleMoves = chess.moves({ verbose: true });
 
-    for (let pgn of pgnsArray) {
-      if (typeof pgn === "string") {
-        this.putPGN(pgn);
-      } else if (pgn && typeof pgn === "object") {
-        if (pgn.pgn) {
-          this.putPGN(pgn.pgn, pgn.result);
-        }
+    for (const move of possibleMoves) {
+      chess.move(move);
+      if (chess.fen() === endFen) {
+        return move;
       }
+      chess.undo();
     }
+
+    return null;
   }
 
   getMovesForPosition(fen) {
-    if (!this.initialized) {
-      return [];
-    }
+    if (!this.initialized) return [];
 
     const normalizedFen = this._normalizeFen(fen);
-    console.log("Looking for moves for FEN:", normalizedFen);
-
-    if (!this.fenNode.has(normalizedFen)) {
-      console.log("FEN not found in position database!");
-      return [];
-    }
+    if (!this.fenNode.has(normalizedFen)) return [];
 
     const node = this.fenNode.get(normalizedFen);
-    console.log("Found node with", node.children.length, "children");
 
-    // Create a new Chess instance for validation
-    const tempChess = new Chess(normalizedFen);
-    const legalMoves = new Set(
-      tempChess.moves({ verbose: true }).map((m) => m.san)
-    );
-
-    const moves = node.children
+    return node.children
       .map((child) => {
-        const isLegal = legalMoves.has(child.san);
-
-        console.log(`Move ${child.san} is ${isLegal ? "LEGAL" : "ILLEGAL"}`);
-
-        const totalGames = child.count;
-        const winPercentage = this._calculateWinPercentage(child);
+        const move = this._getUciMoveFromFens(fen, child.fen);
+        const tempChess = new Chess(normalizedFen);
+        const isLegal = tempChess.move(move);
 
         return {
-          san: child.san,
-          count: totalGames,
+          uci: `${move.from}${move.to}${move.promotion || ""}`,
+          count: child.count,
           fen: child.fen,
           evaluation: child.eval,
-          winPercentage: winPercentage,
+          winPercentage: this._calculateWinPercentage(child),
           whiteWins: child.whiteWins,
           blackWins: child.blackWins,
           draws: child.draws,
-          isLegal: isLegal, // Include this for debugging
+          isLegal: !!isLegal,
         };
       })
-      .filter((m) => m.isLegal) // Remove illegal moves
+      .filter((move) => move.isLegal)
       .sort((a, b) => b.count - a.count);
-
-    return moves;
   }
 
-  async evalTree(
-    startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-  ) {
-    if (!this.initialized) {
-      await this.initialize();
-    }
+  async evalTree(startingPosition = this.root.fen) {
+    if (!this.initialized) await this.initialize();
 
     const normalizedFen = this._normalizeFen(startingPosition);
-
-    if (!this.fenNode.has(normalizedFen)) {
-      return [];
-    }
+    if (!this.fenNode.has(normalizedFen)) return [];
 
     this.chess = new Chess(normalizedFen);
     const root = this.fenNode.get(normalizedFen);
@@ -191,38 +176,26 @@ export class Tree {
   }
 
   _extractResultFromPgn(pgn) {
-    if (pgn.includes("1-0")) {
-      return "1-0";
-    } else if (pgn.includes("0-1")) {
-      return "0-1";
-    } else if (pgn.includes("1/2-1/2")) {
-      return "1/2-1/2";
-    }
+    if (pgn.includes("1-0")) return "1-0";
+    if (pgn.includes("0-1")) return "0-1";
+    if (pgn.includes("1/2-1/2")) return "1/2-1/2";
     return null;
   }
 
   _updateResultCounts(node, result) {
-    if (result === "1-0") {
-      node.whiteWins++;
-    } else if (result === "0-1") {
-      node.blackWins++;
-    } else if (result === "1/2-1/2") {
-      node.draws++;
-    }
+    if (result === "1-0") node.whiteWins++;
+    else if (result === "0-1") node.blackWins++;
+    else if (result === "1/2-1/2") node.draws++;
   }
 
   _calculateWinPercentage(node) {
     const totalGames = node.count;
     if (totalGames === 0) return 0;
 
-    const chess = new Chess(node.fen);
-    const sideToMove = chess.turn() === "w" ? "white" : "black";
-
-    if (sideToMove === "white") {
-      return ((node.whiteWins + node.draws / 2) / totalGames) * 100;
-    } else {
-      return ((node.blackWins + node.draws / 2) / totalGames) * 100;
-    }
+    const sideToMove = new Chess(node.fen).turn() === "w" ? "white" : "black";
+    return sideToMove === "white"
+      ? ((node.whiteWins + node.draws / 2) / totalGames) * 100
+      : ((node.blackWins + node.draws / 2) / totalGames) * 100;
   }
 
   _normalizeFen(fen) {

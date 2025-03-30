@@ -22,10 +22,8 @@ export default class Explorer {
     this.isLoading = true;
 
     try {
-      // Get the games
       this.pgns = await this._fetchGames();
 
-      // Create and initialize the tree
       this.tree = new Tree(this.pgns);
       await this.tree.initialize();
 
@@ -64,7 +62,6 @@ export default class Explorer {
     await this.tree.evalTree(this.startingPosition);
   }
 
-  // Get moves for the current position
   getMovesForPosition(fen = null) {
     if (!this.isInitialized || !this.tree) {
       return [];
@@ -74,13 +71,11 @@ export default class Explorer {
     return this.tree.getMovesForPosition(position);
   }
 
-  // Update position and get moves
   updatePosition(fen) {
     this.currentPosition = fen;
     return this.getMovesForPosition();
   }
 
-  // Refresh explorer data (for example after changing filters)
   async refresh(username, platform, color, days) {
     if (username) this.username = username;
     if (platform) this.platform = platform;
@@ -122,14 +117,18 @@ export default class Explorer {
       const moveElement = document.createElement("li");
       moveElement.className = `explorer-move-${idx % 2}`;
       moveElement.innerHTML = `
-        <div style="width: 50px;">${move.san}</div>
+        <div style="width: 50px;">${move.uci}</div>
         <div style="width: 50px;">${move.count}</div>
         <div style="width: 50px;">${Math.round(move.winPercentage)}%</div>
-        <div style="width: 50px;">${move.evaluation.toFixed(2)}</div>
+        <div style="width: 36px;">${move.evaluation.toFixed(2)}</div>
       `;
       moveElement.addEventListener("click", () => {
-        const event = new CustomEvent("explorer-move-selected", {
-          detail: { san: move.san, fen: move.fen },
+        // const event = new CustomEvent("explorer-move-selected", {
+        //   detail: { san: move.san, fen: move.fen },
+        // });
+
+        const event = new CustomEvent("explorer-uci-move-selected", {
+          detail: { uci: move.uci, fen: move.fen },
         });
         document.dispatchEvent(event);
       });

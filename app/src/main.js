@@ -159,6 +159,17 @@ function makeSanMove(san) {
   return null;
 }
 
+// Make a move using UCI notation
+function makeUCIMove(uci) {
+  const move = state.chess.move(uci);
+  if (move) {
+    updateMoveHistory(move);
+    updateBoard();
+    return move;
+  }
+  return null;
+}
+
 // Navigation
 function navigateMove(direction) {
   if (direction === "prev" && state.currentMoveIndex > 0) {
@@ -282,7 +293,6 @@ async function initApp() {
 
   // Initialize engine
   await state.engine.waitForReady();
-  console.log("Engine ready");
 
   // Set up event listeners
   window.addEventListener("resize", resizeBoard);
@@ -319,9 +329,14 @@ async function initApp() {
   });
 
   // Listen for explorer move selections
-  document.addEventListener("explorer-move-selected", (e) => {
+  document.addEventListener("explorer-san-move-selected", (e) => {
     const { san } = e.detail;
     makeSanMove(san);
+  });
+
+  document.addEventListener("explorer-uci-move-selected", (e) => {
+    const { uci } = e.detail;
+    makeUCIMove(uci);
   });
 
   // Initialize board size
@@ -346,6 +361,7 @@ initApp();
 window.chessFunctions = {
   makeMove,
   makeSanMove,
+  makeUCIMove,
   navigateMove,
   initializeExplorer,
 };
