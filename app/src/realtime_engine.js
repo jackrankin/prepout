@@ -1,5 +1,3 @@
-// this engine is just for whatever is on the board
-
 export default class RealTimeEngine {
   constructor(stockfishPath = "/sf/stockfish-nnue-16.js") {
     this.engine = new Worker(stockfishPath);
@@ -32,28 +30,60 @@ export default class RealTimeEngine {
         if (
           this.currentAnalysis &&
           line.includes("info depth") &&
-          line.includes("multipv") &&
-          line.includes("score cp")
+          line.includes("multipv")
         ) {
           const multipvMatch = /multipv (\d+)/.exec(line);
-          const scoreMatch = /score cp ([-\d]+)/.exec(line);
           const depthMatch = /depth (\d+)/.exec(line);
           const pvMatch = / pv (.+)$/.exec(line);
 
-          if (multipvMatch && scoreMatch && depthMatch && pvMatch) {
+          // Check for either centipawn score or mate score
+          const cpScoreMatch = /score cp ([-\d]+)/.exec(line);
+          const mateScoreMatch = /score mate ([-\d]+)/.exec(line);
+
+          if (
+            multipvMatch &&
+            depthMatch &&
+            pvMatch &&
+            (cpScoreMatch || mateScoreMatch)
+          ) {
             const lineNumber = parseInt(multipvMatch[1]);
-            let score = parseInt(scoreMatch[1]);
-            if (this.currentAnalysis.sideToMove === "b") {
-              score = -score;
-            }
             const depth = parseInt(depthMatch[1]);
             const moves = pvMatch[1].split(" ");
+
+            let score;
+            let isMate = false;
+
+            if (cpScoreMatch) {
+              // Regular centipawn evaluation
+              score = parseInt(cpScoreMatch[1]);
+              if (this.currentAnalysis.sideToMove === "b") {
+                score = -score;
+              }
+            } else if (mateScoreMatch) {
+              // Mate evaluation
+              isMate = true;
+              const mateIn = parseInt(mateScoreMatch[1]);
+
+              // Convert mate score to a large centipawn value
+              // Positive means the side to move can force mate
+              // Negative means the side to move will be mated
+
+              // Conventional conversion: mate in N moves is ±(10000 - N * 10)
+              // This keeps mates sorted by distance (closer mates are higher valued)
+              score = mateIn > 0 ? 10000 - mateIn * 10 : -10000 - mateIn * 10;
+
+              if (this.currentAnalysis.sideToMove === "b") {
+                score = -score;
+              }
+            }
 
             this.lastEvaluations[lineNumber] = {
               line: lineNumber,
               score,
               depth,
               moves,
+              isMate,
+              mateIn: isMate ? mateScoreMatch[1] : null,
               centipawnLoss:
                 lineNumber === 1
                   ? 0

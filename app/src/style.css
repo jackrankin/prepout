@@ -22,6 +22,10 @@ body {
   padding: 0;
 }
 
+a svg {
+  vertical-align: middle;
+}
+
 .content {
   flex: 1;
   display: flex;
@@ -67,19 +71,29 @@ option {
   flex-direction: row;
   justify-content: center;
   gap: 5px;
+  width: calc(100% - 40px); 
+  max-height: calc(100vh - 200px);
+  min-height: 400px;
+  padding-left: 20px;
+  padding-right: 20px;
+  margin: 0 auto; 
 }
+
 
 .board-container {
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .board {
-  height: 75vh;
+  height: 100%;
+  width: 100%;
 }
 
 .right-section {
-  width: 65vh;
+  width: 400px;
+  max-width: 70vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -89,6 +103,23 @@ option {
   padding-bottom: 1rem;
   border-radius: 10px;
   box-sizing: border-box;
+  aspect-ratio: 1 / 1;
+}
+
+#resize-handle {
+  width: 14px;
+  height: 14px;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 1px;
+  cursor: nwse-resize;
+  border-radius: 100%;
+  transition: background-color 0.2s ease-in-out;
+}
+
+#resize-handle:hover {
+  background-color: rgb(69, 121, 69);
 }
 
 .search-parameters {
@@ -100,7 +131,6 @@ option {
 .username-input {
   display: flex;
   flex-grow: inherit;
-  /* width: 120px; */
 }
 
 .engine-evaluation {
@@ -146,7 +176,41 @@ option {
   width: 100%;
 }
 
-.line {
+.line-1 {
+  user-select: none;
+  cursor: pointer;
+  font-weight: bolder;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 5px;
+  background-color: #2a2828;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  flex-direction: row;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.line-2 {
+  user-select: none;
+  cursor: pointer;
+  font-weight: bolder;
+  padding: 5px;
+  margin: 5px;
+  border-radius: 5px;
+  background-color: #2a2828;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  flex-direction: row;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.line-3 {
+  user-select: none;
+  cursor: pointer;
   font-weight: bolder;
   padding: 5px;
   margin: 5px;
@@ -165,7 +229,6 @@ option {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  /* max-width: 100%; */
 }
 
 .white-advantage {
@@ -203,13 +266,12 @@ option {
 }
 
 .explorer-container {
-  font-size: 18px;
-  height: 30vh;
+  font-weight: bold;
   background: #1e1e1e;
   border-radius: 8px;
   padding: 10px;
   overflow-y: auto;
-  font-family: Arial, sans-serif;
+  height: 40%
 }
 
 .explorer-move-list {
@@ -250,44 +312,37 @@ option {
   background: #5f5c5c;
 }
 
+
 @media (max-width: 1120px) {
   .username-input {
     width: 100px;
   }
 
-  .right-section{
-    width: 50vh;
+  .line-2, .line-3 {
+    display: none;
   }
 }
 
-@media (max-width: 900px) {
-  
+@media (max-width: 700px) {
+  .body {
+    min-height: none;
+    overflow: scroll;
+  }
+
   .middle-section {
-    margin-top: 2rem; 
-    margin-bottom: 2rem; 
     flex-direction: column;
     align-items: center;
+    max-height: none;
+    margin-top: 1rem;
   }
 
-  .engine-lines {
-    display: none;
-  }
-
-  .board-container {
-    width: 100%;
-    height: auto;
-  }
-  
   .board {
-    height: 60vh;
-    width: 100%;
+    max-width: 90vw;
+    height: auto;
   }
   
   .right-section {
-    width: 100%;
-    height: auto;
+    width: 90vw;
     margin-top: 10px;
-    padding: 1rem;
-    box-sizing: border-box;
   }
 }

@@ -1,11 +1,9 @@
-// main.js
 import "./style.css";
 import { Chessground } from "chessground";
 import { Chess } from "chess.js";
 import RealTimeEngine from "./realtime_engine";
 import Explorer from "./explorer";
 
-// DOM elements
 const elements = {
   username: document.getElementById("username"),
   websiteOrigin: document.getElementById("websiteOrigin"),
@@ -13,9 +11,16 @@ const elements = {
   icon: document.getElementById("queenIcon"),
   searching: document.getElementById("startSearch"),
   board: document.getElementById("board"),
+  resizeHandle: document.getElementById("resize-handle"),
+  container: document.getElementById("container"),
 
   engineEvaluation: document.getElementById("evaluation-score"),
   engineDepth: document.getElementById("engine-depth"),
+  lines: [
+    document.getElementById("line1"),
+    document.getElementById("line2"),
+    document.getElementById("line3"),
+  ],
   evalScores: [
     document.getElementById("score1"),
     document.getElementById("score2"),
@@ -30,7 +35,6 @@ const elements = {
   explorerMoveList: document.getElementById("explorer-move-list"),
 };
 
-// App state
 const state = {
   userIsWhite: true,
   engine: new RealTimeEngine(),
@@ -41,6 +45,7 @@ const state = {
   currentMoveIndex: 0,
   currentAnalysisId: 0,
   maxDepth: 35,
+  lines: [],
 };
 
 async function initializeExplorer(username, platform, color, days) {
@@ -54,8 +59,6 @@ async function initializeExplorer(username, platform, color, days) {
     state.explorer = new Explorer(username, platform, color, fen, days);
     await state.explorer.initialize();
     state.explorer.render();
-
-    console.log("Explorer initialized successfully");
   } catch (error) {
     console.error("Failed to initialize explorer:", error);
     if (elements.explorerMoveList) {
@@ -77,6 +80,7 @@ state.engine.onEvaluationUpdate = (evaluations, analysisId) => {
   let mx = null;
   let depth = null;
   let prefix = null;
+  state.lines = evaluations.map((line) => line.moves[0]);
 
   evaluations.forEach((line) => {
     const index = line.line - 1;
@@ -109,7 +113,6 @@ state.engine.onEvaluationUpdate = (evaluations, analysisId) => {
   elements.engineDepth.innerText = `(d=${depth}/${state.maxDepth})`;
 };
 
-// Board sizing
 function resizeBoard() {
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
@@ -117,13 +120,11 @@ function resizeBoard() {
   elements.board.style.width = `${size}px`;
   elements.board.style.height = `${size}px`;
 
-  // Trigger chessground resize if it's initialized
   if (state.ground) {
     state.ground.redrawAll();
   }
 }
 
-// Move history management
 function updateMoveHistory(move) {
   if (state.currentMoveIndex < state.moveHistory.length - 1) {
     state.moveHistory.splice(state.currentMoveIndex + 1);
@@ -137,7 +138,6 @@ function updateMoveHistory(move) {
   state.currentMoveIndex = state.moveHistory.length - 1;
 }
 
-// Make a move on the board
 function makeMove(from, to, promotion = undefined) {
   const move = state.chess.move({ from, to, promotion });
   if (move) {
@@ -148,7 +148,6 @@ function makeMove(from, to, promotion = undefined) {
   return null;
 }
 
-// Make a move using SAN notation
 function makeSanMove(san) {
   const move = state.chess.move(san);
   if (move) {
@@ -228,16 +227,13 @@ function calculateDests() {
   return dests;
 }
 
-// Clear evaluation display
 function clearEvaluation() {
   for (let i = 0; i < 3; i++) {
     elements.evalScores[i].innerText = "...";
-    elements.evalScores[i].className = "";
-    elements.evalLines[i].innerText = "";
+    elements.evalLines[i].innerText = "...";
   }
 }
 
-// Engine analysis
 async function analyzeCurrentPosition(fen, depth = state.maxDepth) {
   clearEvaluation();
   state.currentAnalysisId = state.engine.analysisId + 1;
@@ -248,7 +244,6 @@ async function analyzeCurrentPosition(fen, depth = state.maxDepth) {
   }
 }
 
-// Update board state
 function updateBoard() {
   const dests = calculateDests();
 
@@ -277,24 +272,19 @@ function updateBoard() {
   });
 }
 
-// Initialize application
 async function initApp() {
-  // Set up initial move history
   state.moveHistory = [{ fen: state.chess.fen(), move: null }];
   state.currentMoveIndex = 0;
 
-  // Create chessground instance
   const config = {
-    coordinates: true,
+    coordinates: false,
     viewOnly: false,
   };
 
   state.ground = Chessground(elements.board, config);
 
-  // Initialize engine
   await state.engine.waitForReady();
 
-  // Set up event listeners
   window.addEventListener("resize", resizeBoard);
 
   elements.colorToggle.addEventListener("click", () => {
@@ -328,7 +318,66 @@ async function initApp() {
     }
   });
 
-  // Listen for explorer move selections
+  for (let i = 0; i < 3; i++) {
+    elements.lines[i].addEventListener("mouseenter", () => {
+      state.ground.set({
+        drawable: {
+          shapes: [
+            {
+              orig: state.lines[i].substring(0, 2),
+              dest: state.lines[i].substring(2, 4),
+              brush: "green",
+            },
+          ],
+        },
+      });
+    });
+
+    elements.lines[i].addEventListener("mouseleave", () => {
+      state.ground.set({
+        drawable: {
+          shapes: [],
+        },
+      });
+    });
+
+    elements.lines[i].addEventListener("click", () => {
+      makeUCIMove(state.lines[i]);
+    });
+  }
+
+  elements.resizeHandle.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+
+    const minSize = 200;
+    const maxSize = Math.min(window.innerWidth * 0.7, window.innerHeight * 0.7);
+
+    function onMouseMove(event) {
+      let newSize = Math.min(
+        event.clientX - container.offsetLeft,
+        event.clientY - container.offsetTop
+      );
+
+      newSize = Math.max(minSize, newSize);
+      newSize = Math.min(maxSize, newSize);
+
+      elements.board.style.width = `${newSize}px`;
+      elements.board.style.height = `${newSize}px`;
+
+      if (state.ground) {
+        state.ground.redrawAll();
+      }
+    }
+
+    function onMouseUp() {
+      document.removeEventListener("mousemove", onMouseMove);
+      document.removeEventListener("mouseup", onMouseUp);
+    }
+
+    document.addEventListener("mousemove", onMouseMove);
+    document.addEventListener("mouseup", onMouseUp);
+  });
+
   document.addEventListener("explorer-san-move-selected", (e) => {
     const { san } = e.detail;
     makeSanMove(san);
@@ -339,14 +388,8 @@ async function initApp() {
     makeUCIMove(uci);
   });
 
-  // Initialize board size
   resizeBoard();
-
-  // Initialize board position
   updateBoard();
-
-  // Initialize explorer with default values - you can make these configurable
-  // initializeExplorer("username", "lichess", "white", 30);
 }
 
 // Clean up resources on page unload

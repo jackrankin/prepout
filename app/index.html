@@ -4,12 +4,12 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-  <link rel="stylesheet" href="./node_modules/chessground/assets/chessground.base.css" />
-  <link rel="stylesheet" href="./node_modules/chessground/assets/chessground.brown.css" />
-  <link rel="stylesheet" href="./node_modules/chessground/assets/chessground.cburnett.css" />
+  <link rel="stylesheet" href="/assets/chessground.base.css" />
+  <link rel="stylesheet" href="/assets/chessground.brown.css" />
+  <link rel="stylesheet" href="/assets/chessground.cburnett.css" />
   <link rel="stylesheet" href="src/styles.css" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>prepout</title>
+  <title>prepout 👻</title>
   <style>
   </style>
 </head>
@@ -17,14 +17,19 @@
 <body>
   <!-- HEADER -->
   <div class="navbar">
-    prepout 🎠
+    prepout 👻
   </div>
+
   <div class="content">
     <div class="middle-section">
 
       <!-- BOARD -->
       <div id="container" class="board-container">
         <div id="board" class="board"></div>
+        <div id="resize-handle"><svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+            <line x1="0" y1="8" x2="8" y2="0" stroke="black" stroke-width="1.5" />
+            <line x1="3" y1="9" x2="9" y2="3" stroke="black" stroke-width="1.5" />
+          </svg></div>
       </div>
 
       <!-- RIGHT SECTION -->
@@ -32,6 +37,8 @@
 
         <!-- EVALUATION -->
         <div class="evaluation-lines">
+
+          <!-- ENGINE DETAILS AND DEPTH -->
           <div class="engine-evaluation">
             <div id="evaluation-score" class="evaluation-score"></div>
             <div class="engine-details">
@@ -39,16 +46,18 @@
               <div id="engine-depth" class="engine-depth"></div>
             </div>
           </div>
+
+          <!-- ENGINE LINES -->
           <div class="engine-lines">
-            <div class="line" id="line1">
+            <div class="line-1" id="line1">
               <div id="score1"></div>
               <div class="move-list" id="moves1"></div>
             </div>
-            <div class="line" id="line2">
+            <div class="line-2" id="line2">
               <div id="score2"></div>
               <div class="move-list" id="moves2"></div>
             </div>
-            <div class="line" id="line3">
+            <div class="line-3" id="line3">
               <div id="score3"></div>
               <div class="move-list" id="moves3"></div>
             </div>
@@ -96,21 +105,54 @@
               GO
             </button>
           </div>
-
         </div>
       </div>
     </div>
   </div>
   <footer>
     <div style="display: flex; align-items: center; justify-content: center; gap: 2rem">
-      <a class="hover-transition" style="font-size: 12px">instructions</a>
       <a class="hover-transition" style="font-size: 12px; text-decoration:none" target="_blank"
-        rel="noopener noreferrer" href="https://github.com/jackrankin/prepout">github</a>
-      <a class="hover-transition" style="font-size: 12px">settings</a>
+        rel="noopener noreferrer" href="https://github.com/jackrankin/prepout">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" width="14" height="14"
+          stroke="currentColor" class="size-6">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" />
+        </svg>
+        usage
+      </a>
+      <a class="hover-transition" style="font-size: 12px; text-decoration:none" target="_blank"
+        rel="noopener noreferrer" href="https://github.com/jackrankin/prepout">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" width="14" height="14"
+          stroke="currentColor" class="size-6">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9 3.75H6.912a2.25 2.25 0 0 0-2.15 1.588L2.35 13.177a2.25 2.25 0 0 0-.1.661V18a2.25 2.25 0 0 0 2.25 2.25h15A2.25 2.25 0 0 0 21.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 0 0-2.15-1.588H15M2.25 13.5h3.86a2.25 2.25 0 0 1 2.012 1.244l.256.512a2.25 2.25 0 0 0 2.013 1.244h3.218a2.25 2.25 0 0 0 2.013-1.244l.256-.512a2.25 2.25 0 0 1 2.013-1.244h3.859M12 3v8.25m0 0-3-3m3 3 3-3" />
+        </svg>
+        feedback
+      </a>
+      <a class="hover-transition" style="font-size: 12px; text-decoration:none" target="_blank"
+        rel="noopener noreferrer" href="https://github.com/jackrankin/prepout">
+
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="14" height="14" stroke-width="3"
+          stroke="currentColor" class="size-6">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5" />
+        </svg>
+        github
+      </a>
+      <a class="hover-transition" style="font-size: 12px; text-decoration:none" target="_blank"
+        rel="noopener noreferrer" href="https://github.com/jackrankin/prepout">
+
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" width="14" height="14" stroke-width="3"
+          stroke="currentColor" class="size-6">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+        </svg>
+
+        settings</a>
     </div>
   </footer>
 
-  <!-- <script type="module" src="/src/board.js"></script> -->
   <script type="module" src="/src/main.js"></script>
 </body>
 

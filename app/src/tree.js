@@ -132,6 +132,7 @@ export class Tree {
         const isLegal = tempChess.move(move);
 
         return {
+          san: move.san,
           uci: `${move.from}${move.to}${move.promotion || ""}`,
           count: child.count,
           fen: child.fen,
