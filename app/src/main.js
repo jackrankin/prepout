@@ -33,6 +33,14 @@ const elements = {
   ],
 
   explorerMoveList: document.getElementById("explorer-move-list"),
+
+  settingsToggle: document.getElementById("settings"),
+  settingsFooter: document.getElementById("settings-footer"),
+  depthSlider: document.getElementById("depth-slider"),
+  depthValue: document.getElementById("size-value"),
+  blueButton: document.getElementById("blue-button"),
+  greenButton: document.getElementById("green-button"),
+  brownButton: document.getElementById("brown-button"),
 };
 
 const state = {
@@ -44,8 +52,9 @@ const state = {
   moveHistory: [],
   currentMoveIndex: 0,
   currentAnalysisId: 0,
-  maxDepth: 35,
+  maxDepth: 30,
   lines: [],
+  boardTheme: "brown",
 };
 
 async function initializeExplorer(username, platform, color, days) {
@@ -158,7 +167,6 @@ function makeSanMove(san) {
   return null;
 }
 
-// Make a move using UCI notation
 function makeUCIMove(uci) {
   const move = state.chess.move(uci);
   if (move) {
@@ -169,7 +177,6 @@ function makeUCIMove(uci) {
   return null;
 }
 
-// Navigation
 function navigateMove(direction) {
   if (direction === "prev" && state.currentMoveIndex > 0) {
     state.currentMoveIndex--;
@@ -184,7 +191,7 @@ function navigateMove(direction) {
 
   state.chess.load(state.moveHistory[state.currentMoveIndex].fen);
 
-  analyzeCurrentPosition(state.chess.fen(), 25);
+  analyzeCurrentPosition(state.chess.fen(), state.maxDepth);
   updateExplorerDisplay();
 
   const lastMove = state.moveHistory[state.currentMoveIndex].move;
@@ -272,6 +279,44 @@ function updateBoard() {
   });
 }
 
+function toggleSettings() {
+  if (elements.settingsFooter.style.display === "flex") {
+    elements.settingsFooter.style.display = "none";
+  } else {
+    elements.settingsFooter.style.display = "flex";
+  }
+}
+
+function updateBoardTheme(theme) {
+  const cgBoard = document.querySelector("cg-board");
+  if (!cgBoard) return;
+
+  cgBoard.style.backgroundImage = "none";
+
+  switch (theme) {
+    case "blue":
+      cgBoard.style.backgroundImage = "url('/assets/images/blue.svg')";
+      break;
+    case "green":
+      cgBoard.style.backgroundImage = "url('/assets/images/green.png')";
+      break;
+    case "brown":
+      cgBoard.style.backgroundImage = "url('/assets/images/brown.png')";
+      break;
+    default:
+      cgBoard.style.backgroundImage = "url('/assets/images/brown.png')";
+  }
+
+  elements.blueButton.style.border =
+    theme === "blue" ? "2px solid white" : "2px solid transparent";
+  elements.greenButton.style.border =
+    theme === "green" ? "2px solid white" : "2px solid transparent";
+  elements.brownButton.style.border =
+    theme === "brown" ? "2px solid white" : "2px solid transparent";
+
+  state.boardTheme = theme;
+}
+
 async function initApp() {
   state.moveHistory = [{ fen: state.chess.fen(), move: null }];
   state.currentMoveIndex = 0;
@@ -286,6 +331,17 @@ async function initApp() {
   await state.engine.waitForReady();
 
   window.addEventListener("resize", resizeBoard);
+
+  elements.settingsToggle.addEventListener("click", toggleSettings);
+
+  document.addEventListener("click", (e) => {
+    if (
+      !elements.settingsFooter.contains(e.target) &&
+      e.target !== elements.settingsToggle
+    ) {
+      elements.settingsFooter.style.display = "none";
+    }
+  });
 
   elements.colorToggle.addEventListener("click", () => {
     state.userIsWhite = !state.userIsWhite;
@@ -354,8 +410,8 @@ async function initApp() {
 
     function onMouseMove(event) {
       let newSize = Math.min(
-        event.clientX - container.offsetLeft,
-        event.clientY - container.offsetTop
+        event.clientX - elements.container.offsetLeft,
+        event.clientY - elements.container.offsetTop
       );
 
       newSize = Math.max(minSize, newSize);
@@ -388,6 +444,22 @@ async function initApp() {
     makeUCIMove(uci);
   });
 
+  elements.depthSlider.addEventListener("input", () => {
+    const newDepth = parseInt(elements.depthSlider.value, 10);
+    state.maxDepth = newDepth;
+    elements.depthValue.textContent = newDepth;
+
+    analyzeCurrentPosition(state.chess.fen(), state.maxDepth);
+  });
+
+  elements.blueButton.addEventListener("click", () => updateBoardTheme("blue"));
+  elements.greenButton.addEventListener("click", () =>
+    updateBoardTheme("green")
+  );
+  elements.brownButton.addEventListener("click", () =>
+    updateBoardTheme("brown")
+  );
+
   resizeBoard();
   updateBoard();
 }
@@ -407,4 +479,11 @@ window.chessFunctions = {
   makeUCIMove,
   navigateMove,
   initializeExplorer,
+  updateBoardTheme,
+  setEngineDepth: (depth) => {
+    state.maxDepth = depth;
+    elements.depthSlider.value = depth;
+    elements.depthValue.textContent = depth;
+    analyzeCurrentPosition(state.chess.fen(), depth);
+  },
 };
