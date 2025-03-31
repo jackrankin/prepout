@@ -35,6 +35,7 @@ const elements = {
   explorerMoveList: document.getElementById("explorer-move-list"),
 
   settingsToggle: document.getElementById("settings"),
+  settingsPopup: document.getElementById("settings-popup"),
   settingsFooter: document.getElementById("settings-footer"),
   depthSlider: document.getElementById("depth-slider"),
   depthValue: document.getElementById("size-value"),
@@ -336,7 +337,7 @@ async function initApp() {
 
   document.addEventListener("click", (e) => {
     if (
-      !elements.settingsFooter.contains(e.target) &&
+      !elements.settingsPopup.contains(e.target) &&
       e.target !== elements.settingsToggle
     ) {
       elements.settingsFooter.style.display = "none";
