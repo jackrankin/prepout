@@ -210,7 +210,6 @@ function navigateMove(direction) {
   });
 }
 
-// Legal moves calculation
 function calculateDests() {
   const dests = new Map();
   const chess = state.chess;
@@ -323,7 +322,7 @@ async function initApp() {
   state.currentMoveIndex = 0;
 
   const config = {
-    coordinates: false,
+    coordinates: true,
     viewOnly: false,
   };
 
