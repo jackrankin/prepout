@@ -8,6 +8,7 @@ const elements = {
   username: document.getElementById("username"),
   websiteOrigin: document.getElementById("websiteOrigin"),
   colorToggle: document.getElementById("colorToggle"),
+  months: document.getElementById("months"),
   icon: document.getElementById("queenIcon"),
   searching: document.getElementById("startSearch"),
   board: document.getElementById("board"),
@@ -58,7 +59,7 @@ const state = {
   boardTheme: "brown",
 };
 
-async function initializeExplorer(username, platform, color, days) {
+async function initializeExplorer(username, platform, color, months) {
   try {
     if (elements.explorerMoveList) {
       elements.explorerMoveList.innerHTML =
@@ -66,7 +67,7 @@ async function initializeExplorer(username, platform, color, days) {
     }
 
     const fen = state.chess.fen();
-    state.explorer = new Explorer(username, platform, color, fen, days);
+    state.explorer = new Explorer(username, platform, color, fen, months);
     await state.explorer.initialize();
     state.explorer.render();
   } catch (error) {
@@ -322,7 +323,7 @@ async function initApp() {
   state.currentMoveIndex = 0;
 
   const config = {
-    coordinates: true,
+    coordinates: false,
     viewOnly: false,
   };
 
@@ -367,7 +368,7 @@ async function initApp() {
         elements.username.value,
         elements.websiteOrigin.value,
         state.userIsWhite ? "white" : "black",
-        30
+        parseInt(elements.months.value)
       );
     } catch (error) {
       console.error("Error fetching games:", error);

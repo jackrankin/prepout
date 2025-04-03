@@ -60,10 +60,10 @@ option {
 }
 
 .navbar {
-  color: #c3c5c8;
+  color: #dedede;
   padding: 10px;
   background-color: #1e1e1e;
-  font-size: 20px;
+  font-size: 24px;
   text-align: center;
 }
 
@@ -87,12 +87,13 @@ option {
 }
 
 .right-section {
-  width: 500px;
+  width: 600px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   max-width: 70vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: #1e1e1e;
+  background-color: #373535;
   padding: 2rem;
   padding-top: 1rem;
   padding-bottom: 1rem;
@@ -109,6 +110,7 @@ option {
 
 
 .board-container {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
   display: flex;
   flex-direction: column;
   position: relative;
@@ -149,6 +151,7 @@ option {
 }
 
 .username-input {
+  width: 100px;
   display: flex;
   flex-grow: inherit;
 }
@@ -287,11 +290,11 @@ option {
 
 .explorer-container {
   font-weight: bold;
-  background: #1e1e1e;
   border-radius: 8px;
   padding: 10px;
   overflow-y: auto;
-  height: 50%
+  height: 50%;
+  user-select: none;
 }
 
 .explorer-move-list {
@@ -306,9 +309,9 @@ option {
   background-color: #2a2a2c;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 8px;
+  padding: 6px 8px;
   border-radius: 4px;
-  color: #bbbec6;
+  color: #d0d3db;
   cursor: pointer;
   transition: background 0.1s;
   margin-bottom: 4px;
@@ -319,29 +322,36 @@ option {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 8px;
+  padding: 6px 8px;
   border-radius: 4px;
   background-color: #3e3f42;
-  color: #bbbec6;
+  color: #d0d3db;
   cursor: pointer;
   transition: background 0.1s;
   margin-bottom: 4px;
-}
-
-.explorer-move-list li:hover {
-  background: #5f5c5c;
 }
 
 @media (max-width: 1200px) {
   .right-section {
     width: 400px;
   }
+
+  .explorer-container {
+    height: 40%;
+  }
+
+  .search-parameters {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .username-input {
+    width: 175px;
+  }
 }
 
 @media (max-width: 1000px) {
-  .username-input {
-    width: 100px;
-  }
 
   .right-section {
     width: 350px;
@@ -352,7 +362,7 @@ option {
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 850px) {
   body { 
     min-height: initial; 
     overflow: auto;  

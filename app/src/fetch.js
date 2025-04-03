@@ -1,38 +1,49 @@
-const getChesscomGames = async (username, color, lastXdays) => {
-  const url = `https://api.chess.com/pub/player/${username}/games/2025/03`;
+const getChesscomGames = async (username, color, months) => {
+  const currentDate = new Date();
 
-  try {
-    const response = await fetch(url);
+  const urls = [];
+  for (let i = 0; i < months; i++) {
+    const year = currentDate.getFullYear();
+    const month = String(currentDate.getMonth() + 1).padStart(2, "0");
 
-    if (!response.ok) {
-      throw new Error("Failed to fetch data");
-    }
-
-    const data = await response.json();
-    console.log(data, username, color);
-
-    const games = data.games.filter(
-      (game) =>
-        (game.white.username.toLowerCase() === username.toLowerCase() &&
-          color === "white") ||
-        (game.black.username.toLowerCase() === username.toLowerCase() &&
-          color === "black")
+    urls.push(
+      `https://api.chess.com/pub/player/${username}/games/${year}/${month}`
     );
 
-    const pgns = games.map((game) => game.pgn);
+    currentDate.setMonth(currentDate.getMonth() - 1);
+  }
 
-    return pgns;
+  try {
+    const games = [];
+
+    for (const url of urls) {
+      const response = await fetch(url);
+      if (!response.ok) continue;
+
+      const data = await response.json();
+      games.push(
+        ...data.games.filter(
+          (game) =>
+            (game.white.username.toLowerCase() === username.toLowerCase() &&
+              color === "white") ||
+            (game.black.username.toLowerCase() === username.toLowerCase() &&
+              color === "black")
+        )
+      );
+    }
+
+    return games.map((game) => game.pgn);
   } catch (error) {
-    console.error("Error fetching games:", error);
+    console.error("Error fetching Chess.com games:", error);
     throw error;
   }
 };
 
-const getLichessGames = async (username, color, lastXdays) => {
-  const url = `https://lichess.org/api/games/user/${username}?max=500&pgnInJson=true`;
-
+const getLichessGames = async (username, color, months) => {
   const dateRange = new Date();
-  dateRange.setDate(dateRange.getDate() - lastXdays);
+  dateRange.setMonth(dateRange.getMonth() - months);
+
+  const url = `https://lichess.org/api/games/user/${username}?max=500&pgnInJson=true`;
 
   try {
     const response = await fetch(url, {
@@ -67,19 +78,17 @@ const getLichessGames = async (username, color, lastXdays) => {
       return false;
     });
 
-    const pgns = colorFilteredGames.map((game) => game.pgn);
-
-    return pgns;
+    return colorFilteredGames.map((game) => game.pgn);
   } catch (error) {
-    console.error("Error fetching games:", error);
+    console.error("Error fetching Lichess games:", error);
     throw error;
   }
 };
 
-export const getUserGames = (website, username, color, days) => {
+export const getUserGames = (website, username, color, months) => {
   if (website === "chesscom") {
-    return getChesscomGames(username, color, days);
+    return getChesscomGames(username, color, months);
   } else {
-    return getLichessGames(username, color, days);
+    return getLichessGames(username, color, months);
   }
 };

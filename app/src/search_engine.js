@@ -96,7 +96,7 @@ export default class Engine {
   }
 }
 
-export async function analyzeFen(fen, depth = 15) {
+export async function analyzeFen(fen, depth = 18) {
   const engine = new Engine();
   try {
     return await engine.analyzePosition(fen, depth);

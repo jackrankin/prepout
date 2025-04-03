@@ -5,11 +5,12 @@ import { analyzeFen } from "./search_engine";
 export class Node {
   constructor(fen, count, parent) {
     this.fen = fen;
+    this.evaluated = false;
     this.count = count || 0;
     this.parent = parent || null;
     this.children = [];
     this.eval = 0;
-    this.move = null; // Store UCI move { from, to, promotion }
+    this.move = null;
     this.whiteWins = 0;
     this.blackWins = 0;
     this.draws = 0;
@@ -17,8 +18,9 @@ export class Node {
 }
 
 export class Tree {
-  constructor(pgns) {
+  constructor(pgns, color) {
     this.pgns = pgns;
+    this.color = color;
     this.fenNode = new Map();
     this.chess = new Chess();
     this.root = new Node(
@@ -27,17 +29,18 @@ export class Tree {
     );
     this.fenNode.set(this.root.fen, this.root);
     this.initialized = false;
+    this.evaluating = false;
+
+    this.initialize().then(() => {
+      this._startBackgroundEvaluation();
+    });
   }
 
   async initialize() {
     this.pgns = await Promise.resolve(this.pgns);
-    if (Array.isArray(this.pgns)) {
-      await this._parsePGNs();
-      this.initialized = true;
-      return this;
-    } else {
-      throw new Error("Expected pgns to be an array");
-    }
+    await this._parsePGNs();
+    this.initialized = true;
+    return this;
   }
 
   async _parsePGNs() {
@@ -131,6 +134,23 @@ export class Tree {
         const tempChess = new Chess(normalizedFen);
         const isLegal = tempChess.move(move);
 
+        let isBlunder = false;
+        if (node.evaluated && child.evaluated) {
+          const scoreDifference = Math.abs(child.score) - Math.abs(node.score);
+          if (scoreDifference > 0.6) {
+            if (
+              (this.color === "white" &&
+                child.score < node.score &&
+                tempChess.turn() === "b") ||
+              (this.color === "black" &&
+                child.score > node.score &&
+                tempChess.turn() === "w")
+            ) {
+              isBlunder = true;
+            }
+          }
+        }
+
         return {
           san: move.san,
           uci: `${move.from}${move.to}${move.promotion || ""}`,
@@ -142,6 +162,7 @@ export class Tree {
           blackWins: child.blackWins,
           draws: child.draws,
           isLegal: !!isLegal,
+          moveSuperScript: isBlunder ? "??" : "",
         };
       })
       .filter((move) => move.isLegal)
@@ -156,23 +177,35 @@ export class Tree {
 
     this.chess = new Chess(normalizedFen);
     const root = this.fenNode.get(normalizedFen);
+    const queue = [root];
 
-    const dfs = async (node, turn, depth) => {
+    while (queue.length > 0) {
+      const node = queue.shift();
+      if (node.evaluated) {
+        continue;
+      }
+
       try {
-        if (node.eval === 0) {
+        if (node.evaluated === false) {
           const result = await analyzeFen(node.fen);
           node.eval = result.score / 100;
+          node.evaluated = true;
+
+          document.dispatchEvent(
+            new CustomEvent("explorer-node-evaluated", {
+              detail: { fen: node.fen },
+            })
+          );
         }
 
         for (let child of node.children) {
-          await dfs(child, turn === "white" ? "black" : "white", depth + 1);
+          queue.push(child);
         }
       } catch (error) {
         console.error("Error during tree evaluation:", error);
       }
-    };
+    }
 
-    await dfs(root, this.chess.turn() === "w" ? "white" : "black", 0);
     return root;
   }
 
@@ -192,11 +225,21 @@ export class Tree {
   _calculateWinPercentage(node) {
     const totalGames = node.count;
     if (totalGames === 0) return 0;
+    return (
+      ((this.color === "white" ? node.whiteWins : node.blackWins) /
+        node.count) *
+      100
+    );
+  }
 
-    const sideToMove = new Chess(node.fen).turn() === "w" ? "white" : "black";
-    return sideToMove === "white"
-      ? ((node.whiteWins + node.draws / 2) / totalGames) * 100
-      : ((node.blackWins + node.draws / 2) / totalGames) * 100;
+  _startBackgroundEvaluation() {
+    if (this.evaluating) return;
+    this.evaluating = true;
+
+    setTimeout(async () => {
+      await this.evalTree();
+      this.evaluating = false;
+    }, 0);
   }
 
   _normalizeFen(fen) {

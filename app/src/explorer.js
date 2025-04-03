@@ -3,18 +3,25 @@ import { getUserGames } from "./fetch";
 import { Tree } from "./tree";
 
 export default class Explorer {
-  constructor(username, platform, color, fen, days) {
+  constructor(username, platform, color, fen, months) {
     this.username = username;
     this.platform = platform;
     this.color = color;
     this.startingPosition = fen;
     this.currentPosition = fen;
-    this.days = days;
+    this.months = months;
     this.container = document.getElementById("explorer-move-list");
     this.tree = null;
     this.pgns = null;
     this.isInitialized = false;
     this.isLoading = false;
+    this.children = [];
+
+    document.addEventListener("explorer-node-evaluated", (event) => {
+      if (this.children.some((child) => child.fen === event.detail.fen)) {
+        this.render();
+      }
+    });
   }
 
   async initialize() {
@@ -24,14 +31,12 @@ export default class Explorer {
     try {
       this.pgns = await this._fetchGames();
 
-      this.tree = new Tree(this.pgns);
+      this.tree = new Tree(this.pgns, this.color);
       await this.tree.initialize();
-
-      // Evaluate the tree for the starting position
-      // await this._evalTree();
 
       this.isInitialized = true;
       this.isLoading = false;
+
       return this;
     } catch (error) {
       this.isLoading = false;
@@ -46,7 +51,7 @@ export default class Explorer {
         this.platform,
         this.username,
         this.color,
-        this.days
+        this.months
       );
     } catch (error) {
       console.error("Failed to fetch games:", error);
@@ -73,7 +78,29 @@ export default class Explorer {
 
   updatePosition(fen) {
     this.currentPosition = fen;
+    this._startBackgroundEval();
+
     return this.getMovesForPosition();
+  }
+
+  async _startBackgroundEval() {
+    if (!this.tree.fenNode.has(this.currentPosition)) {
+      return;
+    }
+
+    if (this.tree.fenNode.get(this.currentPosition).evaluated) {
+      return;
+    }
+
+    this.tree.evaluating = true;
+
+    try {
+      await this.tree.evalTree(this.currentPosition);
+    } catch (error) {
+      console.error("Background eval failed:", error);
+    } finally {
+      this.tree.evaluating = false;
+    }
   }
 
   async refresh(username, platform, color, days) {
@@ -86,11 +113,9 @@ export default class Explorer {
     return await this.initialize();
   }
 
-  // Render explorer data to the container element
   render() {
     if (!this.container) return;
 
-    // Clear the container
     this.container.innerHTML = "";
 
     if (this.isLoading) {
@@ -105,7 +130,8 @@ export default class Explorer {
       return;
     }
 
-    const moves = this.getMovesForPosition();
+    const moves = this.getMovesForPosition(this.currentPosition);
+    this.children = moves;
 
     if (moves.length === 0) {
       this.container.innerHTML =
@@ -117,10 +143,13 @@ export default class Explorer {
       const moveElement = document.createElement("li");
       moveElement.className = `explorer-move-${idx % 2}`;
       moveElement.innerHTML = `
-        <div style="width: 50px;">${move.san}</div>
+        <div style="width: 70px;">${move.san + move.moveSuperScript}</div>
         <div style="width: 50px;">${move.count}</div>
         <div style="width: 50px;">${Math.round(move.winPercentage)}%</div>
-        <div style="width: 36px;">${move.evaluation.toFixed(2)}</div>
+        <div style="width: 50px;">${
+          (move.evaluation >= 0 ? "+" : "-") +
+          Math.abs(move.evaluation).toFixed(2)
+        }</div>
       `;
       moveElement.addEventListener("click", () => {
         const event = new CustomEvent("explorer-san-move-selected", {
