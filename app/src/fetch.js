@@ -42,8 +42,9 @@ const getChesscomGames = async (username, color, months) => {
 const getLichessGames = async (username, color, months) => {
   const dateRange = new Date();
   dateRange.setMonth(dateRange.getMonth() - months);
+  username = username.toLowerCase();
 
-  const url = `https://lichess.org/api/games/user/${username}?max=500&pgnInJson=true`;
+  const url = `https://lichess.org/api/games/user/${username}?max=200&pgnInJson=true`;
 
   try {
     const response = await fetch(url, {
@@ -64,17 +65,32 @@ const getLichessGames = async (username, color, months) => {
       .filter((game) => game)
       .map((game) => JSON.parse(game));
 
+    console.log(games);
+
     const filteredGames = games.filter((game) => {
       const gameDate = new Date(game.createdAt);
       return gameDate >= dateRange;
     });
 
+    console.log(filteredGames);
+
     const colorFilteredGames = filteredGames.filter((game) => {
-      if (color === "white") {
-        return game.players.white.user.id === username;
-      } else if (color === "black") {
-        return game.players.black.user.id === username;
+      if (game.initialFen) {
+        return false;
       }
+
+      if (color === "white") {
+        return (
+          game.players.white.user && game.players.white.user.id === username
+        );
+      }
+
+      if (color === "black") {
+        return (
+          game.players.black.user && game.players.black.user.id === username
+        );
+      }
+
       return false;
     });
 
