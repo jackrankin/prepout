@@ -296,16 +296,16 @@ function updateBoardTheme(theme) {
 
   switch (theme) {
     case "blue":
-      cgBoard.style.backgroundImage = "url('/assets/images/blue.svg')";
+      cgBoard.style.backgroundImage = "url('/images/blue.svg')";
       break;
     case "green":
-      cgBoard.style.backgroundImage = "url('/assets/images/green.png')";
+      cgBoard.style.backgroundImage = "url('/images/green.png')";
       break;
     case "brown":
-      cgBoard.style.backgroundImage = "url('/assets/images/brown.png')";
+      cgBoard.style.backgroundImage = "url('/images/brown.png')";
       break;
     default:
-      cgBoard.style.backgroundImage = "url('/assets/images/brown.png')";
+      cgBoard.style.backgroundImage = "url('/images/brown.png')";
   }
 
   elements.blueButton.style.border =

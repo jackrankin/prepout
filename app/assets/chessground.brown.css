@@ -3,7 +3,7 @@ cg-board {
   background-color: #f0d9b5;
   /* background-image: url('/assets/images/green.png'); */
   /* background-image: url('/assets/images/blue.svg'); */
-  background-image: url('/assets/images/brown.png');
+  background-image: url('/public/images/brown.png');
 }
 
 /** Interactive board square colors */
