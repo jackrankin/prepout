@@ -1,8 +1,8 @@
 // this engine is used by the search method in the explorer
 
 export default class Engine {
-  constructor(stockfishPath = "/sf/stockfish-nnue-16.js") {
-    this.engine = new Worker(stockfishPath);
+  constructor(stockfishPath = "/sf/stockfish-17-lite-02843c1.js") {
+    this.engine = new Worker(stockfishPath, { type: "module" });
     this.isReady = false;
     this.pendingResolve = null;
     this.currentAnalysis = null;

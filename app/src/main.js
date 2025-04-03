@@ -1,4 +1,4 @@
-import "./style.css";
+import "/assets/style.css";
 import { Chessground } from "chessground";
 import { Chess } from "chess.js";
 import RealTimeEngine from "./realtime_engine";

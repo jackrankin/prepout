@@ -1,6 +1,6 @@
 export default class RealTimeEngine {
-  constructor(stockfishPath = "/sf/stockfish-nnue-16.js") {
-    this.engine = new Worker(stockfishPath);
+  constructor(stockfishPath = "/sf/stockfish-17-lite-02843c1.js") {
+    this.engine = new Worker(stockfishPath, { type: "module" });
     this.isReady = false;
     this.currentAnalysis = null;
     this.pendingResolve = null;
