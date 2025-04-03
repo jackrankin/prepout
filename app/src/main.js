@@ -3,6 +3,7 @@ import { Chessground } from "chessground";
 import { Chess } from "chess.js";
 import RealTimeEngine from "./realtime_engine";
 import Explorer from "./explorer";
+import { analytics } from "./firebase";
 
 const elements = {
   username: document.getElementById("username"),
