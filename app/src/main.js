@@ -15,6 +15,8 @@ const elements = {
   board: document.getElementById("board"),
   resizeHandle: document.getElementById("resize-handle"),
   container: document.getElementById("container"),
+  leftArrow: document.getElementById("left-arrow"),
+  rightArrow: document.getElementById("right-arrow"),
 
   engineEvaluation: document.getElementById("evaluation-score"),
   engineDepth: document.getElementById("engine-depth"),
@@ -351,6 +353,16 @@ async function initApp() {
     elements.icon.innerHTML = state.userIsWhite
       ? `<path fill="white" stroke="black" stroke-width="2" d="M12 2L15 8H9L12 2ZM6 8L9 22H15L18 8H6ZM3 22H21V24H3V22Z"/>`
       : `<path fill="black" stroke="black" stroke-width="2" d="M12 2L15 8H9L12 2ZM6 8L9 22H15L18 8H6ZM3 22H21V24H3V22Z"/>`;
+  });
+
+  elements.leftArrow.addEventListener("click", () => {
+    navigateMove("prev");
+    e.preventDefault();
+  });
+
+  elements.rightArrow.addEventListener("click", () => {
+    navigateMove("next");
+    e.preventDefault();
   });
 
   document.addEventListener("keydown", (e) => {
